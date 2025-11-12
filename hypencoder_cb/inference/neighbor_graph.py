@@ -35,9 +35,9 @@ def embedding_search(
             similarity = -torch.cdist(batch, item_embeddings, p=2)
         elif distance == "ip":
             similarity = batch @ item_embeddings.T
-        top_k = torch.topk(similarity, top_k, dim=1).indices.cpu()
+        top_k_indices = torch.topk(similarity, top_k, dim=1).indices.cpu()
 
-        yield (top_k, batch_offset)
+        yield (top_k_indices, batch_offset)
         batch_offset += batch.shape[0]
 
 
