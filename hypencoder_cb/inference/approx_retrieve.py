@@ -379,7 +379,7 @@ def do_retrieval(
             dtype=dtype,
             batch_size=batch_size,
             query_max_length=query_max_length,
-            ignore_same_id=ignore_same_id,
+            # ignore_same_id=ignore_same_id,
             item_neighbors_path=item_neighbors_path,
             num_entry_points=num_entry_points,
             ncandidates=ncandidates,
