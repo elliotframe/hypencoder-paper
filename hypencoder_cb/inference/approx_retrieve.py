@@ -7,7 +7,7 @@ from typing import Dict, List, Optional, Union
 
 import fire
 import torch
-from numpy import copy
+import copy
 from tqdm import tqdm
 from transformers import AutoTokenizer
 
