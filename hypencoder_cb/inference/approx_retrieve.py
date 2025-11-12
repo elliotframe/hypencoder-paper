@@ -183,6 +183,33 @@ class HypecoderGraphRetriever(BaseRetriever):
             self.ids[idx] for idx in self.entry_point_indices
         ]
 
+    def _set_entry_points_similar(self, query_model):
+        """
+        Selects initial entry points based on similarity between
+        encoded items and the first-layer weights of the query-specific q-net.
+        """
+
+        # Extract the first layer directly from NoTorchSequential
+        first_layer = query_model.layers[0]
+
+        # Handle both NoTorchLinear and NoTorchDenseBlock
+        if hasattr(first_layer, "weight"):
+            W = first_layer.weight.detach().to(self.device, dtype=self.dtype)
+        else:
+            raise RuntimeError("First layer has no accessible weight attribute.")
+
+        # Project encoded items onto directions of the first layer
+        similarities = torch.matmul(self.encoded_item_embeddings, W.T)
+        item_scores = similarities.mean(dim=1)
+
+        values, indices = torch.topk(item_scores, self.num_entry_points)
+
+        self.entry_point_indices = indices.to(self.device, dtype=torch.long)
+        self.entry_point_embeddings = self.encoded_item_embeddings[self.entry_point_indices]
+        self.entry_point_ids = [self.ids[i] for i in self.entry_point_indices]
+
+        print(f"Selected {len(self.entry_point_ids)} query-conditioned entry points.")
+
     def retrieve(self, query: TextQuery, top_k: int) -> List[Item]:
         tokenized_query = self.tokenizer(
             query.text,
@@ -210,6 +237,8 @@ class HypecoderGraphRetriever(BaseRetriever):
                 [self.item_id_to_index[x] for x in candidates]
             ]
             candidate_embeddings = candidate_embeddings.unsqueeze(0)
+            if not callable(query_model):
+                raise TypeError(f"Expected query_model to be callable, got {type(query_model)}")
             similarity_matrix = query_model(candidate_embeddings).squeeze()
 
             ncandidates = min(
