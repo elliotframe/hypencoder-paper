@@ -242,14 +242,13 @@ class HypecoderGraphRetriever(BaseRetriever):
             one = query_model(candidate_embeddings)
             similarity_matrix = one.squeeze()
             if len(similarity_matrix.shape) < 1:
-                print("Invalid similarity_matrix shape:", similarity_matrix.shape)
-                breakpoint()
-            
+                ncandidates = 1
+            else:
             # similarity_matrix = query_model(candidate_embeddings)
             # similarity_matrix = similarity_matrix.view(-1)
-            ncandidates = min(
-                max(self.ncandidates, top_k), similarity_matrix.shape[0]
-            )
+                ncandidates = min(
+                    max(self.ncandidates, top_k), similarity_matrix.shape[0]
+                )
             values, indices = torch.topk(similarity_matrix, ncandidates, dim=0)
 
             indices = indices.squeeze(0).cpu()
