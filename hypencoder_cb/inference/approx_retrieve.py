@@ -241,7 +241,9 @@ class HypecoderGraphRetriever(BaseRetriever):
                 raise TypeError(f"Expected query_model to be callable, got {type(query_model)}")
             one = query_model(candidate_embeddings)
             similarity_matrix = one.squeeze()
+            single = False
             if similarity_matrix.dim() == 0:
+                single = True
                 similarity_matrix = similarity_matrix.unsqueeze(0)
             # similarity_matrix = query_model(candidate_embeddings)
             # similarity_matrix = similarity_matrix.view(-1)
@@ -249,9 +251,13 @@ class HypecoderGraphRetriever(BaseRetriever):
                 max(self.ncandidates, top_k), similarity_matrix.shape[0]
             )
             values, indices = torch.topk(similarity_matrix, ncandidates, dim=0)
-
+            if single:
+                breakpoint()
             indices = indices.squeeze(0).cpu()
             values = values.squeeze(0).cpu()
+
+            if single:
+                breakpoint()
 
             prev_candidates = copy.deepcopy(candidates)
             candidates = []
