@@ -121,7 +121,7 @@ def encode_items_to_disk(
     encoded_iter = encode_items(encoder, items, batch_size=batch_size)
     DocList[EncodedItem].push_stream(
         encoded_iter,
-        f"{output_path}",
+        f"file://{output_path}",
     )
 
 
@@ -168,7 +168,7 @@ def load_encoded_items_from_disk(
     encoded_items_path: str,
 ) -> Iterable[EncodedItem]:
     return DocList[EncodedItem].pull(
-        f"{encoded_items_path}", show_progress=True
+        f"file://{encoded_items_path}", show_progress=True
     )
 
 
