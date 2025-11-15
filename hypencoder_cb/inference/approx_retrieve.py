@@ -253,8 +253,10 @@ class HypecoderGraphRetriever(BaseRetriever):
             values, indices = torch.topk(similarity_matrix, ncandidates, dim=0)
             if single:
                 breakpoint()
-            indices = indices.squeeze(0).cpu()
-            values = values.squeeze(0).cpu()
+            # indices = indices.squeeze(0).cpu()
+            # values = values.squeeze(0).cpu()
+            indices = indices.view(-1).cpu()
+            values  = values.view(-1).cpu()
 
             if single:
                 breakpoint()
