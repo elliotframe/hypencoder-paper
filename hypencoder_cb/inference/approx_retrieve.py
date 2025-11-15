@@ -239,11 +239,14 @@ class HypecoderGraphRetriever(BaseRetriever):
             candidate_embeddings = candidate_embeddings.unsqueeze(0)
             if not callable(query_model):
                 raise TypeError(f"Expected query_model to be callable, got {type(query_model)}")
-            breakpoint()
-            similarity_matrix = query_model(candidate_embeddings).squeeze()
+            one = query_model(candidate_embeddings)
+            similarity_matrix = one.squeeze()
+            if len(similarity_matrix.shape) < 1:
+                print("Invalid similarity_matrix shape:", similarity_matrix.shape)
+                breakpoint()
+            
             # similarity_matrix = query_model(candidate_embeddings)
             # similarity_matrix = similarity_matrix.view(-1)
-            breakpoint()
             ncandidates = min(
                 max(self.ncandidates, top_k), similarity_matrix.shape[0]
             )
