@@ -225,6 +225,7 @@ def do_eval_and_pretty_print(
 
     retrieval_path = Path(retrieval_path)
     retrieval_pretty_path = retrieval_path.with_suffix(".txt")
+    output_dir.mkdir(parents=True, exist_ok=True)
 
     pretty_print_standard_format(
         retrieval_path, output_file=retrieval_pretty_path

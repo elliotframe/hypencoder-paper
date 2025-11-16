@@ -57,8 +57,8 @@ def main(
         for x, y, z in product(nep, nc, mi):
             metric_dir=f"metrics/{ret_name}/entries/{x}-{y}-{z}/aggregated_metrics.json"
 
-            with open(metric_dir, "r") as f:
-                metrics = json.load(f)
+            with open(metric_dir, "r") as g:
+                metrics = json.load(g)
 
             row = {"NumEntryPoints": x, "NCandidates": y, "MaxIter": z}
             row.update(metrics)
