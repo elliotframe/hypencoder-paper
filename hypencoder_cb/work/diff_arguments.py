@@ -17,6 +17,7 @@ def main(
     if not graph:
         graph=item_neighbors_path.split("/")[-1]
     cache_file=f"cache/{graph}"
+    ret_name=output_dir.split("/")[-1]
 
     nep = [5_000, 10_000, 50_000, 100_000, 500_000]
     nc = [24, 64, 150, 328, 600]
@@ -27,7 +28,7 @@ def main(
         num_entry_points = x
         ncandidates = y
         max_iter = z
-        metric_dir=f"metrics/{graph}/entries/{num_entry_points}-{ncandidates}-{max_iter}"
+        metric_dir=f"metrics/{ret_name}/entries/{num_entry_points}-{ncandidates}-{max_iter}"
 
         print(f"Starting retrieval: num_entry_points={num_entry_points}, ncandidates={ncandidates}, max_iter={max_iter}")
         
@@ -50,11 +51,11 @@ def main(
     fieldnames = ["NumEntryPoints", "NCandidates", "MaxIter",
               "P@10", "P@5", "R@10", "R@1000",
               "RR", "RR@10", "nDCG@10", "nDCG@5"]
-    with open(f"metrics/{graph}/results.csv", "w", newline="") as f:
+    with open(f"metrics/{ret_name}/results.csv", "w", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=fieldnames)
         writer.writeheader()
         for x, y, z in product(nep, nc, mi):
-            metric_dir=f"metrics/{graph}/entries/{x}-{y}-{z}/aggregated_metrics.json"
+            metric_dir=f"metrics/{ret_name}/entries/{x}-{y}-{z}/aggregated_metrics.json"
 
             with open(metric_dir, "r") as f:
                 metrics = json.load(f)
