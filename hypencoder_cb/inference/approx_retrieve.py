@@ -10,6 +10,7 @@ import torch
 import copy
 from tqdm import tqdm
 from transformers import AutoTokenizer
+from pathlib import Path
 
 from hypencoder_cb.inference.retrieve import do_retrieval_shared
 from hypencoder_cb.inference.shared import (
@@ -151,7 +152,10 @@ class HypecoderGraphRetriever(BaseRetriever):
                     self.item_id_to_index[neighbor] for neighbor in neighbors
                 ]
 
+
             if cache_file is not None:
+                cache_file = Path(cache_file)
+                cache_file.parent.mkdir(parents=True, exist_ok=True)
                 print(f"Caching to {cache_file}")
                 cache_values = {
                     "item_ids": self.ids,
