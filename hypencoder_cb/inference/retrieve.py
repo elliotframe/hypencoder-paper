@@ -252,6 +252,7 @@ def do_retrieval_shared(
     include_content: bool = True,
     do_eval: bool = True,
     metric_names: Optional[List[str]] = None,
+    metric_dir: Optional[str] = None,
 ) -> None:
     """Does retrieval and optionally evaluation.
 
@@ -286,6 +287,8 @@ def do_retrieval_shared(
         metric_names (Optional[List[str]], optional): A list of metrics to
             compute. These are passed to IR-Measures so should be compatible.
             If None, a default set of metrics is found. Defaults to None.
+        metric_dir (Optional[str]): File path of directory where metrics should
+            be saved.
     Raises:
         ValueError: If both `query_jsonl` and `ir_dataset_name` are provided.
         ValueError: If `do_eval` is True and `ir_dataset_name` is None and
@@ -307,7 +310,8 @@ def do_retrieval_shared(
     output_dir.mkdir(parents=True, exist_ok=True)
 
     retrieval_file = output_dir / "retrieved_items.jsonl"
-    metric_dir = output_dir / "metrics"
+    if not metric_dir:
+        metric_dir = output_dir / "metrics"
 
     retriever = retriever_cls(
         **retriever_kwargs

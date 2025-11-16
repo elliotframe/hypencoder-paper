@@ -327,6 +327,7 @@ def do_retrieval(
     include_content: bool = True,
     do_eval: bool = True,
     metric_names: Optional[List[str]] = None,
+    metric_dir: Optional[str] = None,
     ignore_same_id: bool = False,
 ) -> None:
     """Does retrieval and optionally evaluation.
@@ -387,6 +388,8 @@ def do_retrieval(
         metric_names (Optional[List[str]], optional): A list of metrics to
             compute. These are passed to IR-Measures so should be compatible.
             If None, a default set of metrics is found. Defaults to None.
+        metric_dir (Optional[str]): File path of directory where metrics should
+            be saved.
         ignore_same_id (bool, optional): Whether to ignore retrievals with the
             same ID as the query. This is only relevant for certain datasets.
             Defaults to False.
@@ -427,6 +430,7 @@ def do_retrieval(
         include_content=include_content,
         do_eval=do_eval,
         metric_names=metric_names,
+        metric_dir=metric_dir,
     )
 
 
