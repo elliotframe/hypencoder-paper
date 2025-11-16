@@ -3,6 +3,7 @@ from typing import Dict, List, Optional, Union
 from itertools import product
 import json
 import csv
+import fire
 
 def main(
     model_name_or_path: str,
@@ -75,4 +76,4 @@ def main(
     
 
 if __name__ == "__main__":
-    main()
+    fire.Fire(main)
