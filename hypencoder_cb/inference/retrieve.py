@@ -310,11 +310,13 @@ def do_retrieval_shared(
 
     output_dir = Path(output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
+    metric_dir = Path(metric_dir)
 
     retrieval_file = output_dir / "retrieved_items.jsonl"
     if not metric_dir:
         metric_dir = output_dir / "metrics"
 
+    time_track_file=metric_dir / "timing.json"
     retriever = retriever_cls(
         **retriever_kwargs
     )
@@ -329,6 +331,8 @@ def do_retrieval_shared(
             include_type=include_content,
             query_id_key=query_id_key,
             query_text_key=query_text_key,
+            track_time=True,
+            track_time_file=time_track_file,
         )
     else:
         retrieve_for_ir_dataset_queries(
