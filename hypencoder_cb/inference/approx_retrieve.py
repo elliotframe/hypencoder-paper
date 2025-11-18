@@ -171,6 +171,12 @@ class HypecoderGraphRetriever(BaseRetriever):
 
         self._set_entry_points()
 
+    def set_parameters(self, num_entry_points, ncandidates, max_iter):
+        self.num_entry_points = num_entry_points
+        self.ncandidates = ncandidates
+        self.max_iter = max_iter
+        self._set_entry_points()
+
     def _set_entry_points(self):
         random.seed(43)
         self.entry_point_indices = torch.Tensor(
@@ -333,6 +339,7 @@ def do_retrieval(
     metric_names: Optional[List[str]] = None,
     metric_dir: Optional[str] = None,
     ignore_same_id: bool = False,
+    retriever = None,
 ) -> None:
     """Does retrieval and optionally evaluation.
 
@@ -407,6 +414,7 @@ def do_retrieval(
     retriever_kwargs = retriever_kwargs if retriever_kwargs is not None else {}
 
     do_retrieval_shared(
+        retriever=retriever,
         retriever_cls=HypecoderGraphRetriever,
         retriever_kwargs=dict(
             model_name_or_path=model_name_or_path,

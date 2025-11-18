@@ -242,6 +242,7 @@ def do_eval_and_pretty_print(
 
 
 def do_retrieval_shared(
+    retriever,
     retriever_cls,
     retriever_kwargs: Dict,
     output_dir: str,
@@ -317,9 +318,12 @@ def do_retrieval_shared(
         metric_dir = output_dir / "metrics"
 
     time_track_file=metric_dir / "timing.json"
-    retriever = retriever_cls(
-        **retriever_kwargs
-    )
+
+    if retriever is None:
+        retriever = retriever_cls(
+            **retriever_kwargs
+        )
+    
 
     if query_jsonl is not None:
         retrieve_for_jsonl_queries(

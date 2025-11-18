@@ -1,4 +1,4 @@
-from hypencoder_cb.inference.approx_retrieve import do_retrieval
+from hypencoder_cb.inference.approx_retrieve import do_retrieval, HypecoderGraphRetriever
 from typing import Dict, List, Optional, Union
 from itertools import product
 import json
@@ -24,16 +24,40 @@ def main(
     nc = [24, 64, 150, 328, 600]
     mi = [6, 12, 16, 20, 24]
 
+    retriever_kwargs=dict(
+            model_name_or_path=model_name_or_path,
+            encoded_item_path=encoded_item_path,
+            dtype=dtype,
+            batch_size=100_000,
+            query_max_length=64,
+            item_neighbors_path=item_neighbors_path,
+            num_entry_points=5_000,
+            ncandidates=24,
+            max_iter=6,
+            early_stop=True,
+            device="cuda",
+            cache_file=cache_file,
+        )
+
+
+    retriever = HypecoderGraphRetriever(
+            **retriever_kwargs
+        )
+    
+
+
 
     for x, y, z in product(nep, nc, mi):
         num_entry_points = x
         ncandidates = y
         max_iter = z
         metric_dir=f"metrics/{ret_name}/entries/{num_entry_points}-{ncandidates}-{max_iter}"
+        retriever.set_parameters(num_entry_points, ncandidates, max_iter)
 
         print(f"Starting retrieval: num_entry_points={num_entry_points}, ncandidates={ncandidates}, max_iter={max_iter}")
         
         do_retrieval(
+            retriever=retriever,
             model_name_or_path=model_name_or_path,
             encoded_item_path=encoded_item_path,
             item_neighbors_path=item_neighbors_path,
