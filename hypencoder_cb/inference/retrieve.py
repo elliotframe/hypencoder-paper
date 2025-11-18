@@ -335,8 +335,6 @@ def do_retrieval_shared(
             include_type=include_content,
             query_id_key=query_id_key,
             query_text_key=query_text_key,
-            track_time=True,
-            track_time_file=time_track_file,
         )
     else:
         retrieve_for_ir_dataset_queries(
@@ -347,6 +345,7 @@ def do_retrieval_shared(
             include_content=include_content,
             include_type=include_content,
             track_time=True,
+            track_time_file=time_track_file,
         )
 
     if do_eval:
