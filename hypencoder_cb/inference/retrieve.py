@@ -312,6 +312,7 @@ def do_retrieval_shared(
     output_dir = Path(output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
     metric_dir = Path(metric_dir)
+    metric_dir.mkdir(parents=True, exist_ok=True)
 
     retrieval_file = output_dir / "retrieved_items.jsonl"
     if not metric_dir:
