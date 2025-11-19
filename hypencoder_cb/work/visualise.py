@@ -16,7 +16,7 @@ def main(ret_name: str):
                 "z": int(line["MaxIter"]),
                 "time": float(line["time"]),
                 "num_queries": float(line["num_queries"]),
-                "score": float(line["score"]),
+                "score": float(line["nDCG@10"]),
             })
 
     # Derived metric
