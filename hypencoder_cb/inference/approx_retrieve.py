@@ -170,7 +170,7 @@ class HypecoderGraphRetriever(BaseRetriever):
                     pickle.dump(cache_values, f)
 
         self._set_entry_points_similar()
-        
+
     def set_parameters(self, num_entry_points, ncandidates, max_iter):
         self.num_entry_points = num_entry_points
         self.ncandidates = ncandidates
@@ -193,13 +193,14 @@ class HypecoderGraphRetriever(BaseRetriever):
             self.ids[idx] for idx in self.entry_point_indices
         ]
 
-    def _set_entry_points_similar(self, query_model):
+    def _set_entry_points_similar(self):
         """
         Selects initial entry points based on similarity between
         encoded items and the first-layer weights of the query-specific q-net.
         """
 
         # Extract the first layer directly from NoTorchSequential
+        query_model = self.model
         first_layer = query_model.layers[0]
 
         # Handle both NoTorchLinear and NoTorchDenseBlock
