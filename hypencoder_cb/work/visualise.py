@@ -2,12 +2,11 @@ import csv
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
-import fire
 
 
-def main(ret_name: str):
+def main():
     results = []
-    with open(f"metrics/{ret_name}/results.csv") as f:
+    with open(f"results.csv") as f:
         reader = csv.DictReader(f)
         for line in reader:
             results.append({
@@ -39,4 +38,4 @@ def main(ret_name: str):
 
 
 if __name__ == "__main__":
-    fire.Fire(main)
+    main()

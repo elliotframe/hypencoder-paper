@@ -169,8 +169,8 @@ class HypecoderGraphRetriever(BaseRetriever):
                 with open(cache_file, "wb") as f:
                     pickle.dump(cache_values, f)
 
-        self._set_entry_points()
-
+        self._set_entry_points_similar()
+        
     def set_parameters(self, num_entry_points, ncandidates, max_iter):
         self.num_entry_points = num_entry_points
         self.ncandidates = ncandidates
@@ -207,6 +207,10 @@ class HypecoderGraphRetriever(BaseRetriever):
             W = first_layer.weight.detach().to(self.device, dtype=self.dtype)
         else:
             raise RuntimeError("First layer has no accessible weight attribute.")
+        
+        print(first_layer.shape)
+
+        assert 1==2
 
         # Project encoded items onto directions of the first layer
         similarities = torch.matmul(self.encoded_item_embeddings, W.T)
