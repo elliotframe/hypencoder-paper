@@ -195,11 +195,47 @@ class HypecoderGraphRetriever(BaseRetriever):
             self.ids[idx] for idx in self.entry_point_indices
         ]
 
+    # def _set_entry_points_similar(self, query_model):
+    #     """
+    #     Selects initial entry points based on similarity between
+    #     encoded items and the first-layer weights of the query-specific q-net,
+    #     using GPU FAISS for fast similarity search.
+    #     """
+
+    #     # --- 1. Extract first-layer weight vectors ---
+    #     W = query_model.layers[0].linear.weight.detach().squeeze(0)
+    #     avg_vec = W.mean(dim=0)  # shape [768]
+
+    #     # --- 2. Prepare item embeddings ---
+    #     item_matrix = self.encoded_item_embeddings  # [N_items, 768]
+    #     item_matrix_np = item_matrix.cpu().numpy().astype('float32')
+
+    #     # --- 3. Create CPU FAISS index and move to GPU ---
+    #     index_cpu = faiss.IndexFlatIP(item_matrix_np.shape[1])  # inner product similarity
+    #     index_cpu.add(item_matrix_np)
+
+    #     res = faiss.StandardGpuResources()                     # initialize GPU resources
+    #     gpu_index = faiss.index_cpu_to_gpu(res, 0, index_cpu)  # move index to GPU 0
+
+    #     # --- 4. Prepare query vector ---
+    #     query_np = avg_vec.cpu().numpy().astype('float32').reshape(1, -1)
+
+    #     # --- 5. Perform GPU search ---
+    #     D, I = gpu_index.search(query_np, self.num_entry_points)
+
+    #     # --- 6. Convert results back to torch tensors on your device ---
+    #     self.entry_point_indices = torch.tensor(I[0], device=self.device, dtype=torch.long)
+    #     self.entry_point_embeddings = item_matrix[self.entry_point_indices]
+    #     self.entry_point_ids = [self.ids[i] for i in self.entry_point_indices]
+
+    #     print(f"Selected {len(self.entry_point_ids)} query-conditioned entry points.")
+        
+
     def _set_entry_points_similar(self, query_model):
         """
         Selects initial entry points based on similarity between
         encoded items and the first-layer weights of the query-specific q-net,
-        using GPU FAISS for fast similarity search.
+        using CPU FAISS for similarity search.
         """
 
         # --- 1. Extract first-layer weight vectors ---
@@ -210,18 +246,15 @@ class HypecoderGraphRetriever(BaseRetriever):
         item_matrix = self.encoded_item_embeddings  # [N_items, 768]
         item_matrix_np = item_matrix.cpu().numpy().astype('float32')
 
-        # --- 3. Create CPU FAISS index and move to GPU ---
-        index_cpu = faiss.IndexFlatIP(item_matrix_np.shape[1])  # inner product similarity
-        index_cpu.add(item_matrix_np)
-
-        res = faiss.StandardGpuResources()                     # initialize GPU resources
-        gpu_index = faiss.index_cpu_to_gpu(res, 0, index_cpu)  # move index to GPU 0
+        # --- 3. Create CPU FAISS index ---
+        index = faiss.IndexFlatIP(item_matrix_np.shape[1])  # inner product similarity
+        index.add(item_matrix_np)
 
         # --- 4. Prepare query vector ---
         query_np = avg_vec.cpu().numpy().astype('float32').reshape(1, -1)
 
-        # --- 5. Perform GPU search ---
-        D, I = gpu_index.search(query_np, self.num_entry_points)
+        # --- 5. Perform CPU search ---
+        D, I = index.search(query_np, self.num_entry_points)
 
         # --- 6. Convert results back to torch tensors on your device ---
         self.entry_point_indices = torch.tensor(I[0], device=self.device, dtype=torch.long)
@@ -229,6 +262,7 @@ class HypecoderGraphRetriever(BaseRetriever):
         self.entry_point_ids = [self.ids[i] for i in self.entry_point_indices]
 
         print(f"Selected {len(self.entry_point_ids)} query-conditioned entry points.")
+
 
     def retrieve(self, query: TextQuery, top_k: int) -> List[Item]:
         tokenized_query = self.tokenizer(
