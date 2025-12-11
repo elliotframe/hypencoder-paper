@@ -11,6 +11,7 @@ import copy
 from tqdm import tqdm
 from transformers import AutoTokenizer
 from pathlib import Path
+import faiss
 
 from hypencoder_cb.inference.retrieve import do_retrieval_shared
 from hypencoder_cb.inference.shared import (
@@ -201,29 +202,37 @@ class HypecoderGraphRetriever(BaseRetriever):
         """
 
         # Extract the first layer directly from NoTorchSequential
-        first_layer = query_model.layers[0]
 
-        breakpoint()
 
         # Handle both NoTorchLinear and NoTorchDenseBlock
-        if hasattr(first_layer, "weight"):
-            W = first_layer.weight.detach().to(self.device, dtype=self.dtype)
-        else:
-            raise RuntimeError("First layer has no accessible weight attribute.")
-        
-        print(first_layer.shape)
-        breakpoint()
-        
+        # W = query_model.layers[0].linear.weight.detach().to(self.device, dtype=self.dtype)
+        W = query_model.layers[0].linear.weight.detach().squeeze(0)
+        # vectors = W.unbind(dim=-1)
+        avg_vec = W.mean(dim=0)   
 
-        # Project encoded items onto directions of the first layer
-        similarities = torch.matmul(self.encoded_item_embeddings, W.T)
-        item_scores = similarities.mean(dim=1)
+        item_matrix = self.encoded_item_embeddings  
+        item_matrix_np = item_matrix.cpu().numpy()
 
-        values, indices = torch.topk(item_scores, self.num_entry_points)
+        index = faiss.IndexFlatIP(768) 
+        index.add(item_matrix_np)    
 
-        self.entry_point_indices = indices.to(self.device, dtype=torch.long)
-        self.entry_point_embeddings = self.encoded_item_embeddings[self.entry_point_indices]
+        query_np = avg_vec.cpu().numpy().reshape(1, -1)
+        D, I = index.search(query_np, self.num_entry_points)
+
+        self.entry_point_indices = torch.tensor(I[0], device=self.device, dtype=torch.long)
+        self.entry_point_embeddings = item_matrix[self.entry_point_indices]
         self.entry_point_ids = [self.ids[i] for i in self.entry_point_indices]
+        # Project encoded items onto directions of the first layer
+        # similarities = torch.matmul(self.encoded_item_embeddings, W.T)
+        # item_scores = similarities.mean(dim=1)
+
+        # values, indices = torch.topk(item_scores, self.num_entry_points)
+        
+
+        # self.entry_point_indices = indices.to(self.device, dtype=torch.long)
+        # self.entry_point_embeddings = self.encoded_item_embeddings[self.entry_point_indices]
+        # self.entry_point_ids = [self.ids[i] for i in self.entry_point_indices]
+        
 
         print(f"Selected {len(self.entry_point_ids)} query-conditioned entry points.")
 
