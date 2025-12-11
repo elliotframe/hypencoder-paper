@@ -47,7 +47,7 @@ def main(
 
 
 
-    num_entry_points = 1000
+    num_entry_points = 5000
     ncandidates = 64
     max_iter = 16
     metric_dir=f"metrics/{ret_name}/entries/{num_entry_points}-{ncandidates}-{max_iter}"
