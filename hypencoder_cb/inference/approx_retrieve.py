@@ -176,7 +176,7 @@ class HypecoderGraphRetriever(BaseRetriever):
         self.num_entry_points = num_entry_points
         self.ncandidates = ncandidates
         self.max_iter = max_iter
-        self._set_entry_points()
+        # self._set_entry_points()
 
     def _set_entry_points(self):
         random.seed(43)
