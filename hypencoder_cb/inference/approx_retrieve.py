@@ -198,41 +198,35 @@ class HypecoderGraphRetriever(BaseRetriever):
     def _set_entry_points_similar(self, query_model):
         """
         Selects initial entry points based on similarity between
-        encoded items and the first-layer weights of the query-specific q-net.
+        encoded items and the first-layer weights of the query-specific q-net,
+        using GPU FAISS for fast similarity search.
         """
 
-        # Extract the first layer directly from NoTorchSequential
-
-
-        # Handle both NoTorchLinear and NoTorchDenseBlock
-        # W = query_model.layers[0].linear.weight.detach().to(self.device, dtype=self.dtype)
+        # --- 1. Extract first-layer weight vectors ---
         W = query_model.layers[0].linear.weight.detach().squeeze(0)
-        # vectors = W.unbind(dim=-1)
-        avg_vec = W.mean(dim=0)   
+        avg_vec = W.mean(dim=0)  # shape [768]
 
-        item_matrix = self.encoded_item_embeddings  
-        item_matrix_np = item_matrix.cpu().numpy()
+        # --- 2. Prepare item embeddings ---
+        item_matrix = self.encoded_item_embeddings  # [N_items, 768]
+        item_matrix_np = item_matrix.cpu().numpy().astype('float32')
 
-        index = faiss.IndexFlatIP(768) 
-        index.add(item_matrix_np)    
+        # --- 3. Create CPU FAISS index and move to GPU ---
+        index_cpu = faiss.IndexFlatIP(item_matrix_np.shape[1])  # inner product similarity
+        index_cpu.add(item_matrix_np)
 
-        query_np = avg_vec.cpu().numpy().reshape(1, -1)
-        D, I = index.search(query_np, self.num_entry_points)
+        res = faiss.StandardGpuResources()                     # initialize GPU resources
+        gpu_index = faiss.index_cpu_to_gpu(res, 0, index_cpu)  # move index to GPU 0
 
+        # --- 4. Prepare query vector ---
+        query_np = avg_vec.cpu().numpy().astype('float32').reshape(1, -1)
+
+        # --- 5. Perform GPU search ---
+        D, I = gpu_index.search(query_np, self.num_entry_points)
+
+        # --- 6. Convert results back to torch tensors on your device ---
         self.entry_point_indices = torch.tensor(I[0], device=self.device, dtype=torch.long)
         self.entry_point_embeddings = item_matrix[self.entry_point_indices]
         self.entry_point_ids = [self.ids[i] for i in self.entry_point_indices]
-        # Project encoded items onto directions of the first layer
-        # similarities = torch.matmul(self.encoded_item_embeddings, W.T)
-        # item_scores = similarities.mean(dim=1)
-
-        # values, indices = torch.topk(item_scores, self.num_entry_points)
-        
-
-        # self.entry_point_indices = indices.to(self.device, dtype=torch.long)
-        # self.entry_point_embeddings = self.encoded_item_embeddings[self.entry_point_indices]
-        # self.entry_point_ids = [self.ids[i] for i in self.entry_point_indices]
-        
 
         print(f"Selected {len(self.entry_point_ids)} query-conditioned entry points.")
 
