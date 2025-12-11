@@ -284,7 +284,7 @@ class HypecoderGraphRetriever(BaseRetriever):
         query_np = avg_vec.cpu().numpy().astype('float32').reshape(1, -1)
 
         # --- 5. Perform approximate search ---
-        self.index.nprobe = min(50, 100)  # number of clusters to search; higher = more accurate
+        self.index.nprobe = min(5, 100)  # number of clusters to search; higher = more accurate
         D, I = self.index.search(query_np, self.num_entry_points)
 
         # --- 6. Convert results back to torch tensors on your device ---
