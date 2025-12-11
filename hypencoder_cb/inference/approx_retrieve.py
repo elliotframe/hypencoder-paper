@@ -203,6 +203,8 @@ class HypecoderGraphRetriever(BaseRetriever):
         # Extract the first layer directly from NoTorchSequential
         first_layer = query_model.layers[0]
 
+        breakpoint()
+
         # Handle both NoTorchLinear and NoTorchDenseBlock
         if hasattr(first_layer, "weight"):
             W = first_layer.weight.detach().to(self.device, dtype=self.dtype)
