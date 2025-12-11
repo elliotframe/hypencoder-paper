@@ -169,7 +169,8 @@ class HypecoderGraphRetriever(BaseRetriever):
                 with open(cache_file, "wb") as f:
                     pickle.dump(cache_values, f)
 
-        self._set_entry_points_similar()
+        # Originally uncommented, set once
+        # self._set_entry_points()
 
     def set_parameters(self, num_entry_points, ncandidates, max_iter):
         self.num_entry_points = num_entry_points
