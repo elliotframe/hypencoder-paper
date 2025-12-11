@@ -219,6 +219,7 @@ class HypecoderGraphRetriever(BaseRetriever):
         N, D = item_matrix_np.shape
 
         # --- 3. Initialize GPU resources ---
+        breakpoint()
         res = faiss.StandardGpuResources()
 
         # --- 4. Create GPU IVF index ---
