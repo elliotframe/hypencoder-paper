@@ -193,14 +193,13 @@ class HypecoderGraphRetriever(BaseRetriever):
             self.ids[idx] for idx in self.entry_point_indices
         ]
 
-    def _set_entry_points_similar(self):
+    def _set_entry_points_similar(self, query_model):
         """
         Selects initial entry points based on similarity between
         encoded items and the first-layer weights of the query-specific q-net.
         """
 
         # Extract the first layer directly from NoTorchSequential
-        query_model = self.model
         first_layer = query_model.layers[0]
 
         # Handle both NoTorchLinear and NoTorchDenseBlock
@@ -210,8 +209,8 @@ class HypecoderGraphRetriever(BaseRetriever):
             raise RuntimeError("First layer has no accessible weight attribute.")
         
         print(first_layer.shape)
-
-        assert 1==2
+        breakpoint()
+        
 
         # Project encoded items onto directions of the first layer
         similarities = torch.matmul(self.encoded_item_embeddings, W.T)
@@ -242,6 +241,9 @@ class HypecoderGraphRetriever(BaseRetriever):
             query_model = query_output.representation
 
         final_queue = PriorityQueue(maxsize=top_k)
+
+        # Not in original code, entry points set once for Graph Retriever usually
+        self._set_entry_points_similar(query_model)
 
         candidates = [x for x in self.entry_point_ids]
         explored = set(candidates)
