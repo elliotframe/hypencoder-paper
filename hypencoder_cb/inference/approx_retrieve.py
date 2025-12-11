@@ -231,12 +231,16 @@ class HypecoderGraphRetriever(BaseRetriever):
     #     print(f"Selected {len(self.entry_point_ids)} query-conditioned entry points.")
         
 
-    def _set_entry_points_similar(self, query_model):
+    def _set_entry_points_similar(self, query_model, nlist=100):
         """
         Selects initial entry points based on similarity between
         encoded items and the first-layer weights of the query-specific q-net,
-        using CPU FAISS for similarity search.
+        using a CPU FAISS approximate index (IVF) for faster similarity search.
+
+        Args:
+            nlist (int): number of clusters for IVF. More clusters = more accurate, slower indexing.
         """
+
 
         # --- 1. Extract first-layer weight vectors ---
         W = query_model.layers[0].linear.weight.detach().squeeze(0)
@@ -245,15 +249,19 @@ class HypecoderGraphRetriever(BaseRetriever):
         # --- 2. Prepare item embeddings ---
         item_matrix = self.encoded_item_embeddings  # [N_items, 768]
         item_matrix_np = item_matrix.cpu().numpy().astype('float32')
+        N, D = item_matrix_np.shape
 
-        # --- 3. Create CPU FAISS index ---
-        index = faiss.IndexFlatIP(item_matrix_np.shape[1])  # inner product similarity
-        index.add(item_matrix_np)
+        # --- 3. Create approximate FAISS index ---
+        quantizer = faiss.IndexFlatIP(D)          # the coarse quantizer
+        index = faiss.IndexIVFFlat(quantizer, D, nlist, faiss.METRIC_INNER_PRODUCT)
+        index.train(item_matrix_np)               # train the IVF clusters
+        index.add(item_matrix_np)                 # add all vectors
 
         # --- 4. Prepare query vector ---
         query_np = avg_vec.cpu().numpy().astype('float32').reshape(1, -1)
 
-        # --- 5. Perform CPU search ---
+        # --- 5. Perform approximate search ---
+        index.nprobe = min(10, nlist)  # number of clusters to search; higher = more accurate
         D, I = index.search(query_np, self.num_entry_points)
 
         # --- 6. Convert results back to torch tensors on your device ---
@@ -261,7 +269,8 @@ class HypecoderGraphRetriever(BaseRetriever):
         self.entry_point_embeddings = item_matrix[self.entry_point_indices]
         self.entry_point_ids = [self.ids[i] for i in self.entry_point_indices]
 
-        print(f"Selected {len(self.entry_point_ids)} query-conditioned entry points.")
+        print(f"Selected {len(self.entry_point_ids)} query-conditioned entry points (approximate search).")
+
 
 
     def retrieve(self, query: TextQuery, top_k: int) -> List[Item]:
