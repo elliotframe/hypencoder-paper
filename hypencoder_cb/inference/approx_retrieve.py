@@ -197,9 +197,10 @@ class HypecoderGraphRetriever(BaseRetriever):
         # --- 3. Initialize GPU resources ---
         breakpoint()
         res = faiss.StandardGpuResources()
+        res.setTempMemory(4 * 1024**3)
 
         # --- 4. Create GPU IVF index ---
-        quantizer = faiss.IndexFlatIP(D)  # coarse quantizer on GPU
+        quantizer = faiss.GpuIndexFlatIP(res, D)
         self.gpu_index = faiss.GpuIndexIVFFlat(res, quantizer, D, nlist, faiss.METRIC_INNER_PRODUCT)
 
         # --- 5. Train IVF on GPU ---
