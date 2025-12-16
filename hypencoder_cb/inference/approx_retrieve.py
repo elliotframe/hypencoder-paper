@@ -25,6 +25,20 @@ from hypencoder_cb.modeling.hypencoder import HypencoderDualEncoder
 from hypencoder_cb.utils.jsonl_utils import JsonlReader
 from hypencoder_cb.utils.torch_utils import dtype_lookup
 
+import subprocess
+
+def print_gpu_memory():
+    """Prints current used and total GPU memory in GB."""
+    result = subprocess.run(
+        ["nvidia-smi", "--query-gpu=memory.used,memory.total", "--format=csv,nounits,noheader"],
+        stdout=subprocess.PIPE,
+        encoding='utf-8'
+    )
+    used, total = result.stdout.strip().split(',')
+    used_gb = int(used.strip()) / 1024
+    total_gb = int(total.strip()) / 1024
+    print(f"GPU Memory: {used_gb:.2f} GB / {total_gb:.2f} GB used")
+
 
 class HypecoderGraphRetriever(BaseRetriever):
 
@@ -216,10 +230,18 @@ class HypecoderGraphRetriever(BaseRetriever):
 
         # --- 6. Add embeddings to GPU index ---
         # self.gpu_index.add(self.item_matrix_np)
-        batch_size = 500_000  # adjust for your GPU
+        batch_size = 250_000  # adjust for your GPU
         for start in range(0, N, batch_size):
             end = min(start + batch_size, N)
+
+            print(f"[Batch {start}-{end}] Before add:")
+            print_gpu_memory()
+
             self.gpu_index.add(self.item_matrix_np[start:end])
+
+            print(f"[Batch {start}-{end}] After add:")
+            print_gpu_memory()
+
 
         # --- 7. Configure search ---
         self.gpu_index.nprobe = min(nprobe, nlist)
