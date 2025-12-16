@@ -190,8 +190,9 @@ class HypecoderGraphRetriever(BaseRetriever):
         # --------------
 
         # --- 2. Prepare item embeddings ---
+        
         self.item_matrix = self.encoded_item_embeddings  # [N_items, 768]
-        self.item_matrix_np = self.item_matrix.cpu().numpy().astype('float32')
+        self.item_matrix_np = self.item_matrix.cpu().numpy()
         N, D = self.item_matrix_np.shape
 
         # --- 3. Initialize GPU resources ---
@@ -199,9 +200,12 @@ class HypecoderGraphRetriever(BaseRetriever):
         res = faiss.StandardGpuResources()
         res.setTempMemory(4 * 1024**3)
 
+        cfg = faiss.GpuIndexIVFFlatConfig()
+        cfg.useFloat16 = True
+
         # --- 4. Create GPU IVF index ---
         quantizer = faiss.GpuIndexFlatIP(res, D)
-        self.gpu_index = faiss.GpuIndexIVFFlat(res, quantizer, D, nlist, faiss.METRIC_INNER_PRODUCT)
+        self.gpu_index = faiss.GpuIndexIVFFlat(res, quantizer, D, nlist, faiss.METRIC_INNER_PRODUCT, cfg)
 
         # --- 5. Train IVF on GPU ---
         self.gpu_index.train(self.item_matrix_np)  # training happens fully on GPU
@@ -254,7 +258,7 @@ class HypecoderGraphRetriever(BaseRetriever):
         avg_vec = W.mean(dim=0)  # shape [768]
 
         # --- 8. Prepare query vector ---
-        query_np = avg_vec.cpu().numpy().astype('float32').reshape(1, -1)
+        query_np = avg_vec.cpu().numpy().reshape(1, -1)
 
         # --- 9. Perform GPU search ---
         D, I = self.gpu_index.search(query_np, self.num_entry_points)
