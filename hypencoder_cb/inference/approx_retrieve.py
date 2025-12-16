@@ -207,11 +207,19 @@ class HypecoderGraphRetriever(BaseRetriever):
         quantizer = faiss.GpuIndexFlatIP(res, D)
         self.gpu_index = faiss.GpuIndexIVFFlat(res, quantizer, D, nlist, faiss.METRIC_INNER_PRODUCT, cfg)
 
+        print(self.gpu_index)
+        # assert self.gpu_index.useFloat16
+        breakpoint()
+
         # --- 5. Train IVF on GPU ---
         self.gpu_index.train(self.item_matrix_np)  # training happens fully on GPU
 
         # --- 6. Add embeddings to GPU index ---
-        self.gpu_index.add(self.item_matrix_np)
+        # self.gpu_index.add(self.item_matrix_np)
+        batch_size = 500_000  # adjust for your GPU
+        for start in range(0, N, batch_size):
+            end = min(start + batch_size, N)
+            self.gpu_index.add(self.item_matrix_np[start:end])
 
         # --- 7. Configure search ---
         self.gpu_index.nprobe = min(nprobe, nlist)
