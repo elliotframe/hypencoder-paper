@@ -20,7 +20,7 @@ def main(
     cache_file=f"cache/{graph}"
     ret_name=output_dir.split("/")[-1]
 
-    nep = [5_000, 10_000, 50_000, 100_000, 500_000]
+    nep = [5_000, 10_000, 50_000]
     # Usually includes 100_000 and 500_000
     nc = [24, 64, 150, 328, 600]
     mi = [6, 12, 16, 20, 24]
