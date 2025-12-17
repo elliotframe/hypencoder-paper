@@ -20,8 +20,9 @@ def main(
     cache_file=f"cache/{graph}"
     ret_name=output_dir.split("/")[-1]
 
-    nep = [5_000, 10_000, 50_000]
+    # nep = [5_000, 10_000, 50_000]
     # Usually includes 100_000 and 500_000
+    nep = [1_024, 2_048]
     nc = [24, 64, 150, 328, 600]
     mi = [6, 12, 16, 20, 24]
 
@@ -32,7 +33,7 @@ def main(
             batch_size=100_000,
             query_max_length=64,
             item_neighbors_path=item_neighbors_path,
-            num_entry_points=5_000,
+            num_entry_points=1_024,
             ncandidates=24,
             max_iter=6,
             early_stop=True,
