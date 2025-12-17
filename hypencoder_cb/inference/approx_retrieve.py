@@ -244,7 +244,7 @@ class HypecoderGraphRetriever(BaseRetriever):
 
 
         # --- 7. Configure search ---
-        self.gpu_index.nprobe = min(nprobe, nlist)
+        # self.gpu_index.nprobe = min(nprobe, nlist)
 
     def set_parameters(self, num_entry_points, ncandidates, max_iter):
         self.num_entry_points = num_entry_points
