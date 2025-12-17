@@ -190,57 +190,57 @@ class HypecoderGraphRetriever(BaseRetriever):
                     
         nlist = 100
         nprobe = 10
-        # self.item_matrix_np = self.encoded_item_embeddings.cpu().numpy().astype('float32')
-        # N, D = self.item_matrix_np.shape
+        self.item_matrix_np = self.encoded_item_embeddings.cpu().numpy().astype('float32')
+        N, D = self.item_matrix_np.shape
 
-        # # --- 3. Create approximate FAISS index ---
-        # quantizer = faiss.IndexFlatIP(D)          # the coarse quantizer
-        # self.index = faiss.IndexIVFFlat(quantizer, D, nlist, faiss.METRIC_INNER_PRODUCT)
-        # self.index.train(self.item_matrix_np)               # train the IVF clusters
-        # self.index.add(self.item_matrix_np) 
+        # --- 3. Create approximate FAISS index ---
+        quantizer = faiss.IndexFlatIP(D)          # the coarse quantizer
+        self.index = faiss.IndexIVFFlat(quantizer, D, nlist, faiss.METRIC_INNER_PRODUCT)
+        self.index.train(self.item_matrix_np)               # train the IVF clusters
+        self.index.add(self.item_matrix_np) 
 
         # --------------
         # GPU
         # --------------
 
-        # --- 2. Prepare item embeddings ---
+        # # --- 2. Prepare item embeddings ---
         
-        self.item_matrix = self.encoded_item_embeddings  # [N_items, 768]
-        self.item_matrix_np = self.item_matrix.cpu().numpy()
-        N, D = self.item_matrix_np.shape
+        # self.item_matrix = self.encoded_item_embeddings  # [N_items, 768]
+        # self.item_matrix_np = self.item_matrix.cpu().numpy()
+        # N, D = self.item_matrix_np.shape
 
-        # --- 3. Initialize GPU resources ---
-        breakpoint()
-        res = faiss.StandardGpuResources()
-        res.setTempMemory(4 * 1024**3)
+        # # --- 3. Initialize GPU resources ---
+        # breakpoint()
+        # res = faiss.StandardGpuResources()
+        # res.setTempMemory(4 * 1024**3)
 
-        cfg = faiss.GpuIndexIVFFlatConfig()
-        cfg.useFloat16 = True
+        # cfg = faiss.GpuIndexIVFFlatConfig()
+        # cfg.useFloat16 = True
 
-        # --- 4. Create GPU IVF index ---
-        quantizer = faiss.GpuIndexFlatIP(res, D)
-        self.gpu_index = faiss.GpuIndexIVFFlat(res, quantizer, D, nlist, faiss.METRIC_INNER_PRODUCT, cfg)
+        # # --- 4. Create GPU IVF index ---
+        # quantizer = faiss.GpuIndexFlatIP(res, D)
+        # self.gpu_index = faiss.GpuIndexIVFFlat(res, quantizer, D, nlist, faiss.METRIC_INNER_PRODUCT, cfg)
 
-        print(self.gpu_index)
-        # assert self.gpu_index.useFloat16
-        breakpoint()
+        # print(self.gpu_index)
+        # # assert self.gpu_index.useFloat16
+        # breakpoint()
 
-        # --- 5. Train IVF on GPU ---
-        self.gpu_index.train(self.item_matrix_np)  # training happens fully on GPU
+        # # --- 5. Train IVF on GPU ---
+        # self.gpu_index.train(self.item_matrix_np)  # training happens fully on GPU
 
-        # --- 6. Add embeddings to GPU index ---
-        # self.gpu_index.add(self.item_matrix_np)
-        batch_size = 250_000  # adjust for your GPU
-        for start in range(0, N, batch_size):
-            end = min(start + batch_size, N)
+        # # --- 6. Add embeddings to GPU index ---
+        # # self.gpu_index.add(self.item_matrix_np)
+        # batch_size = 250_000  # adjust for your GPU
+        # for start in range(0, N, batch_size):
+        #     end = min(start + batch_size, N)
 
-            print(f"[Batch {start}-{end}] Before add:")
-            print_gpu_memory()
+        #     print(f"[Batch {start}-{end}] Before add:")
+        #     print_gpu_memory()
 
-            self.gpu_index.add(self.item_matrix_np[start:end])
+        #     self.gpu_index.add(self.item_matrix_np[start:end])
 
-            print(f"[Batch {start}-{end}] After add:")
-            print_gpu_memory()
+        #     print(f"[Batch {start}-{end}] After add:")
+        #     print_gpu_memory()
 
 
         # --- 7. Configure search ---
@@ -270,69 +270,69 @@ class HypecoderGraphRetriever(BaseRetriever):
 
 
 
-    def _set_entry_points_similar(self, query_model):
-        """
-        Selects initial entry points based on similarity between
-        encoded items and the first-layer weights of the query-specific q-net,
-        using a fully GPU FAISS approximate index (IVF) for fast similarity search.
-
-        Args:
-            nlist (int): number of IVF clusters. More clusters = more accurate.
-            nprobe (int): number of clusters to probe during search.
-            gpu_id (int): which GPU to use (0-based).
-        """
-
-
-        # --- 1. Extract first-layer weight vectors ---
-        W = query_model.layers[0].linear.weight.detach().squeeze(0)
-        avg_vec = W.mean(dim=0)  # shape [768]
-
-        # --- 8. Prepare query vector ---
-        query_np = avg_vec.cpu().numpy().reshape(1, -1)
-
-        # --- 9. Perform GPU search ---
-        D, I = self.gpu_index.search(query_np, self.num_entry_points)
-
-        # --- 10. Convert results back to torch tensors ---
-        self.entry_point_indices = torch.tensor(I[0], device=self.device, dtype=torch.long)
-        self.entry_point_embeddings = self.item_matrix[self.entry_point_indices]
-        self.entry_point_ids = [self.ids[i] for i in self.entry_point_indices]
-
-        print(f"Selected {len(self.entry_point_ids)} query-conditioned entry points (fully GPU approximate search).")
-        
-
-
-
-
-        
-
     # def _set_entry_points_similar(self, query_model):
     #     """
     #     Selects initial entry points based on similarity between
     #     encoded items and the first-layer weights of the query-specific q-net,
-    #     using a CPU FAISS approximate index (IVF) for faster similarity search.
+    #     using a fully GPU FAISS approximate index (IVF) for fast similarity search.
 
     #     Args:
-    #         nlist (int): number of clusters for IVF. More clusters = more accurate, slower indexing.
+    #         nlist (int): number of IVF clusters. More clusters = more accurate.
+    #         nprobe (int): number of clusters to probe during search.
+    #         gpu_id (int): which GPU to use (0-based).
     #     """
+
 
     #     # --- 1. Extract first-layer weight vectors ---
     #     W = query_model.layers[0].linear.weight.detach().squeeze(0)
     #     avg_vec = W.mean(dim=0)  # shape [768]
 
-    #     # --- 4. Prepare query vector ---
-    #     query_np = avg_vec.cpu().numpy().astype('float32').reshape(1, -1)
+    #     # --- 8. Prepare query vector ---
+    #     query_np = avg_vec.cpu().numpy().reshape(1, -1)
 
-    #     # --- 5. Perform approximate search ---
-    #     self.index.nprobe = 10  # number of clusters to search; higher = more accurate
-    #     D, I = self.index.search(query_np, self.num_entry_points)
+    #     # --- 9. Perform GPU search ---
+    #     D, I = self.gpu_index.search(query_np, self.num_entry_points)
 
-    #     # --- 6. Convert results back to torch tensors on your device ---
+    #     # --- 10. Convert results back to torch tensors ---
     #     self.entry_point_indices = torch.tensor(I[0], device=self.device, dtype=torch.long)
-    #     self.entry_point_embeddings = self.encoded_item_embeddings[self.entry_point_indices]
+    #     self.entry_point_embeddings = self.item_matrix[self.entry_point_indices]
     #     self.entry_point_ids = [self.ids[i] for i in self.entry_point_indices]
 
-    #     print(f"Selected {len(self.entry_point_ids)} query-conditioned entry points (approximate search).")
+    #     print(f"Selected {len(self.entry_point_ids)} query-conditioned entry points (fully GPU approximate search).")
+        
+
+
+
+
+        
+
+    def _set_entry_points_similar(self, query_model):
+        """
+        Selects initial entry points based on similarity between
+        encoded items and the first-layer weights of the query-specific q-net,
+        using a CPU FAISS approximate index (IVF) for faster similarity search.
+
+        Args:
+            nlist (int): number of clusters for IVF. More clusters = more accurate, slower indexing.
+        """
+
+        # --- 1. Extract first-layer weight vectors ---
+        W = query_model.layers[0].linear.weight.detach().squeeze(0)
+        avg_vec = W.mean(dim=0)  # shape [768]
+
+        # --- 4. Prepare query vector ---
+        query_np = avg_vec.cpu().numpy().astype('float32').reshape(1, -1)
+
+        # --- 5. Perform approximate search ---
+        self.index.nprobe = 10  # number of clusters to search; higher = more accurate
+        D, I = self.index.search(query_np, self.num_entry_points)
+
+        # --- 6. Convert results back to torch tensors on your device ---
+        self.entry_point_indices = torch.tensor(I[0], device=self.device, dtype=torch.long)
+        self.entry_point_embeddings = self.encoded_item_embeddings[self.entry_point_indices]
+        self.entry_point_ids = [self.ids[i] for i in self.entry_point_indices]
+
+        print(f"Selected {len(self.entry_point_ids)} query-conditioned entry points (approximate search).")
 
 
 
