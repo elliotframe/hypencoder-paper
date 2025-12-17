@@ -186,18 +186,18 @@ class HypecoderGraphRetriever(BaseRetriever):
                     pickle.dump(cache_values, f)
 
         # Originally uncommented, set once
-        # self._set_entry_points()
+        self._set_entry_points()
                     
-        nlist = 100
-        nprobe = 10
-        self.item_matrix_np = self.encoded_item_embeddings.cpu().numpy().astype('float32')
-        N, D = self.item_matrix_np.shape
+        # nlist = 100
+        # nprobe = 10
+        # self.item_matrix_np = self.encoded_item_embeddings.cpu().numpy().astype('float32')
+        # N, D = self.item_matrix_np.shape
 
-        # --- 3. Create approximate FAISS index ---
-        quantizer = faiss.IndexFlatIP(D)          # the coarse quantizer
-        self.index = faiss.IndexIVFFlat(quantizer, D, nlist, faiss.METRIC_INNER_PRODUCT)
-        self.index.train(self.item_matrix_np)               # train the IVF clusters
-        self.index.add(self.item_matrix_np) 
+        # # --- 3. Create approximate FAISS index ---
+        # quantizer = faiss.IndexFlatIP(D)          # the coarse quantizer
+        # self.index = faiss.IndexIVFFlat(quantizer, D, nlist, faiss.METRIC_INNER_PRODUCT)
+        # self.index.train(self.item_matrix_np)               # train the IVF clusters
+        # self.index.add(self.item_matrix_np) 
 
         # --------------
         # GPU
@@ -250,7 +250,7 @@ class HypecoderGraphRetriever(BaseRetriever):
         self.num_entry_points = num_entry_points
         self.ncandidates = ncandidates
         self.max_iter = max_iter
-        # self._set_entry_points()
+        self._set_entry_points()
 
     def _set_entry_points(self):
         random.seed(43)
@@ -355,7 +355,7 @@ class HypecoderGraphRetriever(BaseRetriever):
         final_queue = PriorityQueue(maxsize=top_k)
 
         # Not in original code, entry points set once for Graph Retriever usually
-        self._set_entry_points_similar(query_model)
+        # self._set_entry_points_similar(query_model)
 
         candidates = [x for x in self.entry_point_ids]
         explored = set(candidates)
