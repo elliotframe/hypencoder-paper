@@ -14,6 +14,7 @@ from pathlib import Path
 import faiss
 import numpy as np
 import pyterrier as pt
+from pyterrier_pisa import PisaIndex
 import pandas as pd
 import shutil
 
@@ -801,7 +802,7 @@ class HypecoderGraphRetrieverBM25(BaseRetriever):
         temp_index_ref = iter_indexer.index(df.to_dict('records'))
         
         # Convert to PISA format
-        pt.pisa.PisaIndex.from_terrier(
+        PisaIndex.from_terrier(
             temp_index_ref,
             self.index_path,
             overwrite=True
