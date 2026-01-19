@@ -761,7 +761,9 @@ class HypecoderGraphRetrieverBM25(BaseRetriever):
         if self.retriever is None:
             raise ValueError("No index loaded.")
 
-        results = self.retriever.query(query)
+        # results = self.retriever.query(query)
+        df = pt.new.queries(query)
+        results = self.retriever.transform(df)
         
         if len(results) == 0:
             return []
