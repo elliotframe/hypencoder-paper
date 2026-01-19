@@ -4,6 +4,7 @@ from itertools import product
 import json
 import csv
 import fire
+import os
 
 def main(
     model_name_or_path: str,
