@@ -647,6 +647,8 @@ class HypecoderGraphRetrieverBM25(BaseRetriever):
         self.b = b
         self.index_path = index_path
         self.ir_dataset = ir_dataset
+        self.index_ref = None
+        self.retriever = None
 
         print(model_name_or_path)
         self.model = (
@@ -740,21 +742,19 @@ class HypecoderGraphRetrieverBM25(BaseRetriever):
             self.fit(items_from_ir_dataset(ir_dataset))
 
     def _index_exists(self) -> bool:
-        """Check if an index exists at the given path."""
-        # PyTerrier PISA indices have a data.properties file
-        properties_file = os.path.join(self.index_path, "data.properties")
-        return os.path.exists(properties_file)
+        """Check if a PISA index exists at the given path."""
+        # PISA indices have these files
+        return os.path.exists(os.path.join(self.index_path, "index.pisa"))
       
     def _load_index(self) -> None:
-        """Load an existing index from disk."""
-        self.index_ref = pt.IndexRef.of(os.path.join(self.index_path, "data.properties"))
-        self.retriever = pt.BatchRetrieve(
-            self.index_ref,
-            wmodel="BM25",
-            controls={'bm25.k_1': str(self.k1), 'bm25.b': str(self.b)}
+        """Load an existing PISA index from disk."""
+        self.index_ref = self.index_path
+        self.retriever = pt.pisa.PisaIndex(self.index_path).bm25(
+            k1=self.k1,
+            b=self.b
         )
 
-    def fit(self, documents: Iterable[Item], overwrite: bool = False) -> 'HypecoderGraphRetrieverBM25':
+    def fit(self, documents: Iterable, overwrite: bool = False) -> 'BM25':
         """
         Preprocess documents and build PISA index.
         
@@ -767,7 +767,7 @@ class HypecoderGraphRetrieverBM25(BaseRetriever):
         """
         # If index exists and we're not overwriting, skip building
         if self._index_exists() and not overwrite:
-            print(f"Index already exists at {self.index_path}. Loading existing index.")
+            print(f"PISA index already exists at {self.index_path}. Loading existing index.")
             if self.retriever is None:
                 self._load_index()
             return self
@@ -785,29 +785,32 @@ class HypecoderGraphRetrieverBM25(BaseRetriever):
         if len(df) == 0:
             return self
         
-        # Create iterator for indexing
+        print(f"Building PISA index at {self.index_path}...")
+        
+        # First create a standard PyTerrier index
+        temp_index_path = self.index_path + "_temp"
         iter_indexer = pt.IterDictIndexer(
-            self.index_path,
+            temp_index_path,
             overwrite=True,
-            meta={'docno': 26},  # Adjust meta field size as needed
-            type='pisa'  # Use PISA indexing for speed
+            meta={'docno': 100}
+        )
+        temp_index_ref = iter_indexer.index(df.to_dict('records'))
+        
+        # Convert to PISA format
+        pt.pisa.PisaIndex.from_terrier(
+            temp_index_ref,
+            self.index_path,
+            overwrite=True
         )
         
-        # Build the index
-        print(f"Building index at {self.index_path}...")
-        self.index_ref = iter_indexer.index(df.to_dict('records'))
+        # Load the PISA index
+        self._load_index()
         
-        # Create BM25 retriever with custom parameters
-        self.retriever = pt.BatchRetrieve(
-            self.index_ref,
-            wmodel="BM25",
-            controls={'bm25.k_1': str(self.k1), 'bm25.b': str(self.b)}
-        )
-        
-        print(f"Index built successfully with {len(df)} documents.")
+        print(f"PISA index built successfully with {len(df)} documents.")
         
         return self
     
+
     def query(self, query: str, n: int) -> List[str]:
         """
         Find the n most relevant documents to the query.
