@@ -1,4 +1,4 @@
-from hypencoder_cb.inference.approx_retrieve import do_retrieval, HypecoderGraphRetriever
+from hypencoder_cb.inference.approx_retrieve import do_retrieval, HypecoderGraphRetriever, HypecoderGraphRetrieverBM25
 from typing import Dict, List, Optional, Union
 from itertools import product
 import json
@@ -19,6 +19,7 @@ def main(
         graph=item_neighbors_path.split("/")[-1]
     cache_file=f"cache/{graph}"
     ret_name=output_dir.split("/")[-1]
+    index_path=f"BM25index/{ir_dataset_name}"
 
     nep = [5_000, 10_000, 50_000, 100_000, 500_000]
     nc = [24, 64, 150, 328, 600]
@@ -37,17 +38,19 @@ def main(
             early_stop=True,
             device="cuda",
             cache_file=cache_file,
+            ir_dataset=ir_dataset_name,
+            index_path=index_path,
         )
 
 
-    retriever = HypecoderGraphRetriever(
+    retriever = HypecoderGraphRetrieverBM25(
             **retriever_kwargs
         )
     
 
 
 
-    num_entry_points = 2048
+    num_entry_points = 10_000
     ncandidates = 64
     max_iter = 16
     metric_dir=f"metrics/{ret_name}/entries/{num_entry_points}-{ncandidates}-{max_iter}"
