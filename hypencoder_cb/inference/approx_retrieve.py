@@ -15,6 +15,7 @@ import faiss
 import numpy as np
 import pyterrier as pt
 import pandas as pd
+import shutil
 
 from hypencoder_cb.inference.retrieve import do_retrieval_shared
 from hypencoder_cb.inference.shared import (
@@ -786,9 +787,12 @@ class HypecoderGraphRetrieverBM25(BaseRetriever):
             return self
         
         print(f"Building PISA index at {self.index_path}...")
+
+        os.makedirs(self.index_path, exist_ok=True)
         
         # First create a standard PyTerrier index
         temp_index_path = self.index_path + "_temp"
+        os.makedirs(temp_index_path, exist_ok=True)
         iter_indexer = pt.IterDictIndexer(
             temp_index_path,
             overwrite=True,
@@ -803,6 +807,12 @@ class HypecoderGraphRetrieverBM25(BaseRetriever):
             overwrite=True
         )
         
+        # Clean up temporary index (optional)
+        try:
+            shutil.rmtree(temp_index_path)
+        except:
+            pass  # If cleanup fails, it's not critical
+
         # Load the PISA index
         self._load_index()
         
