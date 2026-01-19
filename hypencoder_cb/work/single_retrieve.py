@@ -19,7 +19,7 @@ def main(
         graph=item_neighbors_path.split("/")[-1]
     cache_file=f"cache/{graph}"
     ret_name=output_dir.split("/")[-1]
-    index_path=f"BM25index/{ir_dataset_name}"
+    index_path=f"BM25index/trecdl2019judged"
 
     nep = [5_000, 10_000, 50_000, 100_000, 500_000]
     nc = [24, 64, 150, 328, 600]
