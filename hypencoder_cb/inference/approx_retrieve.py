@@ -649,7 +649,7 @@ class HypecoderGraphRetrieverBM25(BaseRetriever):
         self.b = b
         self.index_path = index_path
         self.ir_dataset = ir_dataset
-        self.index_ref = None
+        self.index_ref = "irds:msmarco-passage"
         self.retriever = None
 
         print(model_name_or_path)
@@ -737,111 +737,31 @@ class HypecoderGraphRetrieverBM25(BaseRetriever):
 
         # Originally uncommented, set once
         # self._set_entry_points()
-                    
-        if self._index_exists():
-            self._load_index()
-        else:
-            self.fit(items_from_ir_dataset(ir_dataset))
+        pt.init()
+        
+        self.index = PisaIndex(self.index_path)
+        dataset = pt.get_dataset(self.index_ref)
+        self.index.index(dataset.get_corpus_iter())
+        self.retriever = self.index.bm25(k1=self.k1, b=self.b, num_results = self.num_entry_points)
+        # if self._index_exists():
+        #     self._load_index()
+        # else:
+        #     self.fit(items_from_ir_dataset(ir_dataset))
 
-    def _index_exists(self) -> bool:
-        """Check if a PISA index exists at the given path."""
-        # PISA indices have these files
-        return os.path.exists(os.path.join(self.index_path, "index.pisa"))
-      
-    def _load_index(self) -> None:
-        """Load an existing PISA index from disk."""
-        self.index_ref = self.index_path
-        self.retriever = pt.pisa.PisaIndex(self.index_path).bm25(
-            k1=self.k1,
-            b=self.b
-        )
-
-    def fit(self, documents: Iterable, overwrite: bool = False) -> 'BM25':
-        """
-        Preprocess documents and build PISA index.
-        
-        Args:
-            documents: Iterable of Item objects with 'text' and 'id' attributes
-            overwrite: If True, rebuild index even if one exists (default: False)
-            
-        Returns:
-            self for method chaining
-        """
-        # If index exists and we're not overwriting, skip building
-        if self._index_exists() and not overwrite:
-            print(f"PISA index already exists at {self.index_path}. Loading existing index.")
-            if self.retriever is None:
-                self._load_index()
-            return self
-        
-        # Convert documents to DataFrame format required by PyTerrier
-        docs_data = []
-        for item in documents:
-            docs_data.append({
-                'docno': item.id,
-                'text': item.text
-            })
-        
-        df = pd.DataFrame(docs_data)
-        
-        if len(df) == 0:
-            return self
-        
-        print(f"Building PISA index at {self.index_path}...")
-
-        os.makedirs(self.index_path, exist_ok=True)
-        
-        # First create a standard PyTerrier index
-        temp_index_path = self.index_path + "_temp"
-        os.makedirs(temp_index_path, exist_ok=True)
-        iter_indexer = pt.IterDictIndexer(
-            temp_index_path,
-            overwrite=True,
-            meta={'docno': 100}
-        )
-        temp_index_ref = iter_indexer.index(df.to_dict('records'))
-        
-        # Convert to PISA format
-        PisaIndex.from_terrier(
-            temp_index_ref,
-            self.index_path,
-            overwrite=True
-        )
-        
-        # Clean up temporary index (optional)
-        try:
-            shutil.rmtree(temp_index_path)
-        except:
-            pass  # If cleanup fails, it's not critical
-
-        # Load the PISA index
-        self._load_index()
-        
-        print(f"PISA index built successfully with {len(df)} documents.")
-        
-        return self
-    
-
-    def query(self, query: str, n: int) -> List[str]:
+    def query(self, query: str) -> List[str]:
         """
         Find the n most relevant documents to the query.
         
         Args:
             query: Search query string
-            n: Number of top documents to return
             
         Returns:
             List of document IDs for the n most relevant documents
         """
         if self.retriever is None:
-            raise ValueError("No index loaded. Call fit() first or provide a valid index_path.")
-        
-        # Create query DataFrame
-        query_df = pd.DataFrame([{'qid': '1', 'query': query}])
-        
-        # Retrieve with custom num_results
-        retriever_n = self.retriever % n  # Set number of results
-        results = retriever_n.transform(query_df)
+            raise ValueError("No index loaded.")
+
+        results = self.retriever.query(query)
         
         if len(results) == 0:
             return []
@@ -876,7 +796,7 @@ class HypecoderGraphRetrieverBM25(BaseRetriever):
 
     def _set_entry_points_similar(self, query):
 
-        top_item_ids = self.query(query, self.num_entry_points)
+        top_item_ids = self.query(query)
         self.entry_point_indices = torch.tensor(
             [self.item_id_to_index[item_id] for item_id in top_item_ids],
             dtype=torch.long,
