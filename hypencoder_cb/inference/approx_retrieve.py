@@ -743,7 +743,7 @@ class HypecoderGraphRetrieverBM25(BaseRetriever):
         # dataset = pt.get_dataset(self.index_ref)
         # self.index.index(dataset.get_corpus_iter())
 
-        if not os.path.exists(os.path.join(self.index_path, "fwd.docs")):
+        if not os.path.exists(os.path.join(self.index_path, "fwd.documents")):
             # Index doesn't exist, build it
             dataset = pt.get_dataset(self.index_ref)
             self.index.index(dataset.get_corpus_iter())
