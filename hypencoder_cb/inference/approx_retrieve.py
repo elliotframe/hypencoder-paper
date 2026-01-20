@@ -785,6 +785,7 @@ class HypecoderGraphRetrieverBM25(BaseRetriever):
         self.num_entry_points = num_entry_points
         self.ncandidates = ncandidates
         self.max_iter = max_iter
+        self.retriever = self.index.bm25(k1=self.k1, b=self.b, num_results = self.num_entry_points)
         # self._set_entry_points()
 
     def _set_entry_points(self):
