@@ -1,9 +1,10 @@
-from hypencoder_cb.inference.approx_retrieve import do_retrieval, HypecoderGraphRetriever
+from hypencoder_cb.inference.approx_retrieve import do_retrieval, HypecoderGraphRetriever, HypecoderGraphRetrieverBM25
 from typing import Dict, List, Optional, Union
 from itertools import product
 import json
 import csv
 import fire
+import os
 
 def main(
     model_name_or_path: str,
@@ -19,13 +20,14 @@ def main(
         graph=item_neighbors_path.split("/")[-1]
     cache_file=f"cache/{graph}"
     ret_name=output_dir.split("/")[-1]
+    index_path = os.path.abspath(f"BM25index/trecdl2019judged")
 
-    # nep = [5_000, 10_000, 50_000]
+    nep = [2_048, 5_000, 10_000, 50_000, 100_000, 500_000]
     # Usually includes 100_000 and 500_000
-    nep = [1_024, 2_048]
+    # nep = [1_024, 2_048]
     nc = [24, 64, 150, 328, 600]
     mi = [6, 12, 16, 20, 24]
-
+    
     retriever_kwargs=dict(
             model_name_or_path=model_name_or_path,
             encoded_item_path=encoded_item_path,
@@ -33,16 +35,18 @@ def main(
             batch_size=100_000,
             query_max_length=64,
             item_neighbors_path=item_neighbors_path,
-            num_entry_points=1_024,
+            num_entry_points=5_000,
             ncandidates=24,
             max_iter=6,
             early_stop=True,
             device="cuda",
             cache_file=cache_file,
+            ir_dataset=ir_dataset_name,
+            index_path=index_path,
         )
 
 
-    retriever = HypecoderGraphRetriever(
+    retriever = HypecoderGraphRetrieverBM25(
             **retriever_kwargs
         )
     
