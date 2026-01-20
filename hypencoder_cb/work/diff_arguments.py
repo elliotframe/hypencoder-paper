@@ -22,11 +22,13 @@ def main(
     ret_name=output_dir.split("/")[-1]
     index_path = os.path.abspath(f"BM25index/trecdl2019judged")
 
-    nep = [2_048, 5_000, 10_000, 50_000, 100_000, 500_000]
+    # nep = [2_048, 5_000, 10_000, 50_000, 100_000, 500_000]
     # Usually includes 100_000 and 500_000
-    # nep = [1_024, 2_048]
-    nc = [24, 64, 150, 328, 600]
-    mi = [6, 12, 16, 20, 24]
+    nep = [1_024, 2_048, 5_000, 10_000, 50_000, 100_000]
+    # nc = [24, 64, 150, 328, 600]
+    nc = [6, 12, 18, 24, 64, 150]
+    # mi = [6, 12, 16, 20, 24]
+    mi = [3,4,5,6,12,16]
     
     retriever_kwargs=dict(
             model_name_or_path=model_name_or_path,
