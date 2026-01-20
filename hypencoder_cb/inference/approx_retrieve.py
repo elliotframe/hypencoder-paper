@@ -746,11 +746,11 @@ class HypecoderGraphRetrieverBM25(BaseRetriever):
         if not os.path.exists(os.path.join(self.index_path, "fwd.docs")):
             # Index doesn't exist, build it
             dataset = pt.get_dataset(self.index_ref)
-            self.index.index(dataset.get_corpus_iter(), mode='create')
+            self.index.index(dataset.get_corpus_iter())
         else:
             # Index exists, just load it
             print(f"PISA index already exists at {self.index_path}. Loading existing index.")
-            
+
         self.retriever = self.index.bm25(k1=self.k1, b=self.b, num_results = self.num_entry_points)
         # if self._index_exists():
         #     self._load_index()
