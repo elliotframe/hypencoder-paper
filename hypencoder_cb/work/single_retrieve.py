@@ -49,30 +49,56 @@ def main(
         )
     
 
-
-
-    num_entry_points = 1_000
-    ncandidates = 1
-    max_iter = 0
-    metric_dir=f"metrics/{ret_name}/entries/{num_entry_points}-{ncandidates}-{max_iter}"
-    retriever.set_parameters(num_entry_points, ncandidates, max_iter)
-
-    print(f"Starting retrieval: num_entry_points={num_entry_points}, ncandidates={ncandidates}, max_iter={max_iter}")
-    
-    do_retrieval(
-        retriever=retriever,
-        model_name_or_path=model_name_or_path,
-        encoded_item_path=encoded_item_path,
-        item_neighbors_path=item_neighbors_path,
-        output_dir=output_dir,
-        ir_dataset_name=ir_dataset_name,
-        dtype=dtype,
-        num_entry_points=num_entry_points,
-        ncandidates=ncandidates,
-        max_iter=max_iter,
-        cache_file=cache_file,
-        metric_dir=metric_dir
+    print(
+        "Enter parameters as: <num_entry_points> <ncandidates> <max_iter>\n"
+        "Type 'end' to stop."
     )
+
+    while True:
+        user_input = input(">>> ").strip()
+
+        if user_input.lower() == "end":
+            print("Ending retrieval loop.")
+            break
+
+        try:
+            x, y, z = map(int, user_input.split())
+        except ValueError:
+            print("Invalid input. Expected three integers or 'end'.")
+            continue
+
+        num_entry_points = x
+        ncandidates = y
+        max_iter = z
+
+        metric_dir = (
+            f"metrics/{ret_name}/entries/"
+            f"{num_entry_points}-{ncandidates}-{max_iter}"
+        )
+
+        retriever.set_parameters(num_entry_points, ncandidates, max_iter)
+
+        print(
+            f"Starting retrieval: "
+            f"num_entry_points={num_entry_points}, "
+            f"ncandidates={ncandidates}, "
+            f"max_iter={max_iter}"
+        )
+
+        do_retrieval(
+            retriever=retriever,
+            model_name_or_path=model_name_or_path,
+            encoded_item_path=encoded_item_path,
+            item_neighbors_path=item_neighbors_path,
+            output_dir=output_dir,
+            ir_dataset_name=ir_dataset_name,
+            dtype=dtype,
+            num_entry_points=num_entry_points,
+            ncandidates=ncandidates,
+            max_iter=max_iter,
+            cache_file=cache_file,
+            metric_dir=metric_dir,
+        )
 
 
     # print("Combining metrics.")
