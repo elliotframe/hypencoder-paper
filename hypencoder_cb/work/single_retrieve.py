@@ -51,9 +51,9 @@ def main(
 
 
 
-    num_entry_points = 10_000
-    ncandidates = 64
-    max_iter = 16
+    num_entry_points = 1_000
+    ncandidates = 1
+    max_iter = 0
     metric_dir=f"metrics/{ret_name}/entries/{num_entry_points}-{ncandidates}-{max_iter}"
     retriever.set_parameters(num_entry_points, ncandidates, max_iter)
 
