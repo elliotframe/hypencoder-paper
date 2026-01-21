@@ -846,6 +846,7 @@ class HypecoderGraphRetrieverBM25(BaseRetriever):
 
         curr_iter = 0
         while curr_iter < self.max_iter:
+            breakpoint()
             candidate_embeddings = self.encoded_item_embeddings[
                 [self.item_id_to_index[x] for x in candidates]
             ]
