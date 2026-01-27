@@ -1201,7 +1201,7 @@ class HypecoderGraphRetrieverHybrid(BaseRetriever):
         final_queue = PriorityQueue(maxsize=top_k)
 
         # Not in original code, entry points set once for Graph Retriever usually
-        self._set_entry_points_similar(query.text)
+        self._set_entry_points_hybrid(query.text)
 
         candidates = [x for x in self.entry_point_ids]
         explored = set(candidates)
