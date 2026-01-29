@@ -1,4 +1,4 @@
-from hypencoder_cb.inference.approx_retrieve import do_retrieval, HypecoderGraphRetriever, HypecoderGraphRetrieverBM25
+from hypencoder_cb.inference.approx_retrieve import do_retrieval, HypecoderGraphRetriever, HypecoderGraphRetrieverBM25, HypecoderGraphRetrieverBM25Twice
 from typing import Dict, List, Optional, Union
 from itertools import product
 import json
@@ -44,7 +44,7 @@ def main(
         )
 
 
-    retriever = HypecoderGraphRetrieverBM25(
+    retriever = HypecoderGraphRetrieverBM25Twice(
             **retriever_kwargs
         )
     
