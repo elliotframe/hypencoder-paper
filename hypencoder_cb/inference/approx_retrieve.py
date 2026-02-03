@@ -215,7 +215,7 @@ class HypecoderGraphRetriever(BaseRetriever):
         N, D = self.item_matrix_np.shape
 
         # --- 3. Initialize GPU resources ---
-        breakpoint()
+        # breakpoint()
         res = faiss.StandardGpuResources()
         res.setTempMemory(4 * 1024**3)
 
@@ -846,7 +846,7 @@ class HypecoderGraphRetrieverBM25(BaseRetriever):
 
         curr_iter = 0
         while curr_iter < self.max_iter:
-            breakpoint()
+            # breakpoint()
             candidate_embeddings = self.encoded_item_embeddings[
                 [self.item_id_to_index[x] for x in candidates]
             ]
@@ -1553,7 +1553,7 @@ class HypecoderGraphRetrieverBM25Twice(BaseRetriever):
 
         curr_iter = 0
         while curr_iter < self.max_iter:
-            breakpoint()
+            # breakpoint()
             candidate_embeddings = self.encoded_item_embeddings[
                 [self.item_id_to_index[x] for x in candidates]
             ]
@@ -1628,7 +1628,7 @@ class HypecoderGraphRetrieverBM25Twice(BaseRetriever):
 
             bm25_rank = bm25_ranks.get(neural_item.id, 1000)
             k = 60
-            neural_rank = len(neural_items) - len([s for s, _ in neural_items if s > neural_item.score]) + 1
+            neural_rank = len(neural_items) - len([s.score for s in neural_items if s.score > neural_item.score]) + 1
             rrf_score = self.alpha * (1 / (k + neural_rank)) + (1 - self.alpha) * (1 / (k + bm25_rank))
 
             combined_items.append(
