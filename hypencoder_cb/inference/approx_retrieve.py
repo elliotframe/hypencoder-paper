@@ -1621,6 +1621,8 @@ class HypecoderGraphRetrieverBM25Twice(BaseRetriever):
                 )
             )
 
+        neural_items.reverse()
+        neural_ranks = {item.id: rank + 1 for rank, item in enumerate(neural_items)}
         bm25_ranks = {doc_id: rank + 1 for rank, doc_id in enumerate(self.top_item_ids)}
         combined_items = []
 
@@ -1628,13 +1630,13 @@ class HypecoderGraphRetrieverBM25Twice(BaseRetriever):
 
             bm25_rank = bm25_ranks.get(neural_item.id, 1000)
             k = 60
-            neural_rank = len(neural_items) - len([s.score for s in neural_items if s.score > neural_item.score]) + 1
+            neural_rank = neural_ranks[neural_item.id]
             rrf_score = self.alpha * (1 / (k + neural_rank)) + (1 - self.alpha) * (1 / (k + bm25_rank))
 
             combined_items.append(
                 Item(
-                    text=self.item_id_to_content[item_id],
-                    id=item_id,
+                    text=neural_item.text,
+                    id=neural_item.id,
                     score=rrf_score,
                     type="hypecoder_graph_retriever",
                     )
