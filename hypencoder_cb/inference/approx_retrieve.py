@@ -1463,16 +1463,6 @@ class HypecoderGraphRetrieverBM25Twice(BaseRetriever):
         # else:
         #     self.fit(items_from_ir_dataset(ir_dataset))
 
-        self.bm25 = pt.FeaturesBatchRetrieve(
-            self.index,
-            features=["bm25"],
-            wmodel="BM25",
-            controls={
-                "bm25.k_1": self.k1,
-                "bm25.b": self.b,
-            }
-        )
-
     def query(self, query: str) -> List[str]:
         """
         Find the n most relevant documents to the query.
@@ -1525,14 +1515,14 @@ class HypecoderGraphRetrieverBM25Twice(BaseRetriever):
 
     def _set_entry_points_similar(self, query):
 
-        top_item_ids = self.query(query)
+        self.top_item_ids = self.query(query)
         self.entry_point_indices = torch.tensor(
-            [self.item_id_to_index[item_id] for item_id in top_item_ids],
+            [self.item_id_to_index[item_id] for item_id in self.top_item_ids],
             dtype=torch.long,
             device=self.device
         )
         self.entry_point_embeddings = self.encoded_item_embeddings[self.entry_point_indices]
-        self.entry_point_ids = top_item_ids
+        self.entry_point_ids = self.top_item_ids
 
         print(f"Selected {len(self.entry_point_ids)} query-conditioned entry points (BM25)")
 
@@ -1619,10 +1609,10 @@ class HypecoderGraphRetrieverBM25Twice(BaseRetriever):
 
             curr_iter += 1
 
-        items = []
+        neural_items = []
         while not final_queue.empty():
             score, item_id = final_queue.get()
-            items.append(
+            neural_items.append(
                 Item(
                     text=self.item_id_to_content[item_id],
                     id=item_id,
@@ -1631,56 +1621,28 @@ class HypecoderGraphRetrieverBM25Twice(BaseRetriever):
                 )
             )
 
-        candidates = pd.DataFrame({
-            "qid": ["q0"] * len(items),
-            "query": [query.text] * len(items),
-            "docno": [item.id for item in items],
-        })
+        bm25_ranks = {doc_id: rank + 1 for rank, doc_id in enumerate(self.top_item_ids)}
+        combined_items = []
 
-        scored = self.bm25(candidates)
-        
-        score_map = {
-            row.docno: row.features[0]
-            for row in scored.itertuples()
-        }
+        for neural_item in neural_items:
 
-        orig_min = float("inf")
-        orig_max = float("-inf")
-        bm25_min = float("inf")
-        bm25_max = float("-inf")
+            bm25_rank = bm25_ranks.get(neural_item.id, 1000)
+            k = 60
+            neural_rank = len(neural_items) - len([s for s, _ in neural_items if s > neural_item.score]) + 1
+            rrf_score = self.alpha * (1 / (k + neural_rank)) + (1 - self.alpha) * (1 / (k + bm25_rank))
 
-        for item in items:
-            s = item.score
-            orig_min = min(orig_min, s)
-            orig_max = max(orig_max, s)
-
-            b = score_map.get(item.id, 0.0)
-            bm25_min = min(bm25_min, b)
-            bm25_max = max(bm25_max, b)
-
-        orig_den = orig_max - orig_min
-        bm25_den = bm25_max - bm25_min
-
-        inv_orig_den = 1.0 / orig_den if orig_den > 0 else 0.0
-        inv_bm25_den = 1.0 / bm25_den if bm25_den > 0 else 0.0
-
-        for item in items:
-            # normalize original score
-            s = item.score
-            s = (s - orig_min) * inv_orig_den if inv_orig_den else 0.0
-
-            # normalize BM25
-            b = score_map.get(item.id, 0.0)
-            b = (b - bm25_min) * inv_bm25_den if inv_bm25_den else 0.0
-
-            # combine
-            item.score = self.alpha * s + (1.0-self.alpha) * b
-            item.type = "hybrid_rescore"
+            combined_items.append(
+                Item(
+                    text=self.item_id_to_content[item_id],
+                    id=item_id,
+                    score=rrf_score,
+                    type="hypecoder_graph_retriever",
+                    )
+            )
 
         
 
-
-        return sorted(items, key=lambda x: x.score, reverse=True)
+        return sorted(combined_items, key=lambda x: x.score, reverse=True)[:top_k]
 
 if __name__ == "__main__":
     fire.Fire(do_retrieval)
