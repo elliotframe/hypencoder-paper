@@ -1465,6 +1465,7 @@ class HypecoderGraphRetrieverBM25Twice(BaseRetriever):
 
         self.bm25 = pt.FeaturesBatchRetrieve(
             self.index,
+            features=["bm25"],
             wmodel="BM25",
             controls={
                 "bm25.k_1": self.k1,
