@@ -983,17 +983,17 @@ class HypecoderGraphRetrieverNew(BaseRetriever):
             if (self.rrf_bm25):
                 bm25_ranks = {doc_id: rank + 1 for rank, doc_id in enumerate(self.top_item_ids)}
             if (self.rrf_dph):
-                dph_ranks = {doc_id: rank + 1 for rank, doc_id in enumerate(self.query(query.text), retriever="dph")}
+                dph_ranks = {doc_id: rank + 1 for rank, doc_id in enumerate(self.query(query.text, retriever="dph"))}
         elif (self.seed_dph):
             if (self.rrf_bm25):
-                bm25_ranks = {doc_id: rank + 1 for rank, doc_id in enumerate(self.query(query.text), retriever="bm25")}
+                bm25_ranks = {doc_id: rank + 1 for rank, doc_id in enumerate(self.query(query.text, retriever="bm25"))}
             if (self.rrf_dph):
                 dph_ranks = {doc_id: rank + 1 for rank, doc_id in enumerate(self.top_item_ids)} 
         else:
             if (self.rrf_bm25):
-                bm25_ranks = {doc_id: rank + 1 for rank, doc_id in enumerate(self.query(query.text), retriever="bm25")}
+                bm25_ranks = {doc_id: rank + 1 for rank, doc_id in enumerate(self.query(query.text, retriever="bm25"))}
             if (self.rrf_dph):
-                dph_ranks = {doc_id: rank + 1 for rank, doc_id in enumerate(self.query(query.text), retriever="dph")}
+                dph_ranks = {doc_id: rank + 1 for rank, doc_id in enumerate(self.query(query.text, retriever="dph"))}
 
         combined_items = []
 
