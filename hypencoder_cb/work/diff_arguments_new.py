@@ -137,8 +137,6 @@ def main(
             seed_dph=True,
             rrf_bm25=False,
             rrf_dph=False,
-            k1=k1,
-            b=b,
         )
 
         print(f"Starting retrieval: num_entry_points={num_entry_points}, ncandidates={ncandidates}, max_iter={max_iter}")
@@ -181,7 +179,7 @@ def main(
 
 
     # -----------
-    # test11: Test different k1, b values for seeding and rrh with BM25
+    # test11: Test different k1, b values for seeding and rrf with BM25
     # -----------
     output_dir = "retrievals/test11"
     ret_name=output_dir.split("/")[-1]
@@ -410,8 +408,6 @@ def main(
                 seed_dph=False,
                 rrf_bm25=False,
                 rrf_dph=False,
-                k1=k1,
-                b=b,
                 random_seed=seed
             )
 
