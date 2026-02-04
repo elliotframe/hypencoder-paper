@@ -832,6 +832,7 @@ class HypecoderGraphRetrieverNew(BaseRetriever):
         if b:
             self.b = b
         self.bm25_retriever = self.index.bm25(k1=self.k1, b=self.b, num_results = self.num_entry_points)
+        self.dph_retriever = self.index.dph(num_results = self.num_entry_points)
         self.seed_bm25 = seed_bm25
         self.seed_dph = seed_dph
         self.rrf_bm25 = rrf_bm25
