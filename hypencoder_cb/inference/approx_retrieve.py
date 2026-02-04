@@ -576,7 +576,7 @@ def do_retrieval(
 
 
 
-class HypecoderGraphRetrieverBM25(BaseRetriever):
+class HypecoderGraphRetrieverNew(BaseRetriever):
 
     def __init__(
         self,
@@ -596,6 +596,12 @@ class HypecoderGraphRetrieverBM25(BaseRetriever):
         dtype: Union[torch.dtype, str] = "float32",
         k1: float = 1.5,
         b: float = 0.75,
+        seed_bm25: bool = True,
+        seed_dph: bool = False,
+        rrf_bm25: bool = False,
+        rrf_dph: bool = False,
+        random_seed: int = 43,
+        alpha: float = 0.9,
     ) -> None:
         """
 
@@ -630,7 +636,13 @@ class HypecoderGraphRetrieverBM25(BaseRetriever):
             dtype (Union[torch.dtype, str], optional): The dtype to use for
                 the model and embeddings. Defaults to "float32".
             k1 (float, optional): Term frequency saturation parameter (default: 1.5)
-            b: (float, optional): Length normalisation parameter (default: 0.75)
+            b (float, optional): Length normalisation parameter (default: 0.75)
+            seed_bm25 (bool, optional): Flag on whether to seed search w/ BM25 (default: True)
+            seed_dph (bool, optional): Flag on whether to seed search w/ dph (default: False)
+            rrf_bm25 (bool, optional): Flag on whether to consider BM25 rankings w/ RRF (default: False)
+            rrf_dph (bool, optional): Flag on whether to consider dph rankings w/ RRF (default: False)
+            random_seed (int, optional): Integer seed for randomly selected search entry points (default: 43)
+            alpha: (float, optional): Weight given to Hypencoder scores in RRF (default: 0.7)
         """
 
         if isinstance(dtype, str):
@@ -651,6 +663,12 @@ class HypecoderGraphRetrieverBM25(BaseRetriever):
         self.ir_dataset = ir_dataset
         self.index_ref = "irds:msmarco-passage"
         self.retriever = None
+        self.seed_bm25 = seed_bm25
+        self.seed_dph = seed_dph
+        self.rrf_bm25 = rrf_bm25
+        self.rrf_dph = rrf_dph
+        self.random_seed = random_seed
+        self.alpha = alpha
 
         print(model_name_or_path)
         self.model = (
@@ -735,13 +753,8 @@ class HypecoderGraphRetrieverBM25(BaseRetriever):
                 with open(cache_file, "wb") as f:
                     pickle.dump(cache_values, f)
 
-        # Originally uncommented, set once
-        # self._set_entry_points()
         pt.init()
-        
         self.index = PisaIndex(self.index_path)
-        # dataset = pt.get_dataset(self.index_ref)
-        # self.index.index(dataset.get_corpus_iter())
 
         if not os.path.exists(os.path.join(self.index_path, "fwd.documents")):
             # Index doesn't exist, build it
@@ -751,13 +764,19 @@ class HypecoderGraphRetrieverBM25(BaseRetriever):
             # Index exists, just load it
             print(f"PISA index already exists at {self.index_path}. Loading existing index.")
 
-        self.retriever = self.index.bm25(k1=self.k1, b=self.b, num_results = self.num_entry_points)
+        self.bm25_retriever = self.index.bm25(k1=self.k1, b=self.b, num_results = self.num_entry_points)
+        self.dph_retriever = self.index.dph(num_results = self.num_entry_points)
+
+        if not(seed_bm25 or seed_dph):
+            self._set_entry_points()
+
+        
         # if self._index_exists():
         #     self._load_index()
         # else:
         #     self.fit(items_from_ir_dataset(ir_dataset))
 
-    def query(self, query: str) -> List[str]:
+    def query(self, query: str, retriever: str = None) -> List[str]:
         """
         Find the n most relevant documents to the query.
         
@@ -767,12 +786,28 @@ class HypecoderGraphRetrieverBM25(BaseRetriever):
         Returns:
             List of document IDs for the n most relevant documents
         """
-        if self.retriever is None:
-            raise ValueError("No index loaded.")
 
-        # results = self.retriever.query(query)
+        if (self.seed_bm25 and self.seed_dph):
+            raise ValueError("Cannot seed with both bm25 and dph")
+        
         df = pt.new.queries(query)
-        results = self.retriever.transform(df)
+
+        if (retriever == "bm25"):
+            if self.bm25_retriever is None:
+                raise ValueError("No index loaded.")
+            results = self.bm25_retriever.transform(df)
+        elif (retriever == "dph"):
+            if self.dph_retriever is None:
+                raise ValueError("No index loaded.")
+            results = self.dph_retriever.transform(df)
+        elif (self.seed_bm25):
+            if self.bm25_retriever is None:
+                raise ValueError("No index loaded.")
+            results = self.bm25_retriever.transform(df)
+        elif (self.seed_dph):
+            if self.dph_retriever is None:
+                raise ValueError("No index loaded.")
+            results = self.dph_retriever.transform(df)
         
         if len(results) == 0:
             return []
@@ -788,8 +823,27 @@ class HypecoderGraphRetrieverBM25(BaseRetriever):
         self.retriever = self.index.bm25(k1=self.k1, b=self.b, num_results = self.num_entry_points)
         # self._set_entry_points()
 
+    def set_parameters(self, num_entry_points, ncandidates, max_iter, seed_bm25=True, seed_dph=False, rrf_bm25=False, rrf_dph=False, k1=None, b=None, alpha=0.9, random_seed=43):
+        self.num_entry_points = num_entry_points
+        self.ncandidates = ncandidates
+        self.max_iter = max_iter
+        if k1:
+            self.k1 = k1
+        if b:
+            self.b = b
+        self.bm25_retriever = self.index.bm25(k1=self.k1, b=self.b, num_results = self.num_entry_points)
+        self.seed_bm25 = seed_bm25
+        self.seed_dph = seed_dph
+        self.rrf_bm25 = rrf_bm25
+        self.rrf_dph = rrf_dph
+        self.alpha = alpha
+        self.random_seed = random_seed
+        if (not (seed_dph or seed_bm25)):
+            self._set_entry_points()
+
+
     def _set_entry_points(self):
-        random.seed(43)
+        random.seed(self.random_seed)
         self.entry_point_indices = torch.Tensor(
             random.sample(
                 range(self.encoded_item_embeddings.shape[0]),
@@ -817,7 +871,7 @@ class HypecoderGraphRetrieverBM25(BaseRetriever):
         self.entry_point_embeddings = self.encoded_item_embeddings[self.entry_point_indices]
         self.entry_point_ids = top_item_ids
 
-        print(f"Selected {len(self.entry_point_ids)} query-conditioned entry points (BM25)")
+        print(f"Selected {len(self.entry_point_ids)} query-conditioned entry points")
 
 
     def retrieve(self, query: TextQuery, top_k: int) -> List[Item]:
@@ -839,14 +893,15 @@ class HypecoderGraphRetrieverBM25(BaseRetriever):
         final_queue = PriorityQueue(maxsize=top_k)
 
         # Not in original code, entry points set once for Graph Retriever usually
-        self._set_entry_points_similar(query.text)
+        if (self.seed_bm25 or self.seed_dph):
+            self._set_entry_points_similar(query.text)
 
         candidates = [x for x in self.entry_point_ids]
         explored = set(candidates)
 
         curr_iter = 0
         while curr_iter < self.max_iter:
-            # breakpoint()
+
             candidate_embeddings = self.encoded_item_embeddings[
                 [self.item_id_to_index[x] for x in candidates]
             ]
@@ -902,10 +957,11 @@ class HypecoderGraphRetrieverBM25(BaseRetriever):
 
             curr_iter += 1
 
-        items = []
+        
+        neural_items = []
         while not final_queue.empty():
             score, item_id = final_queue.get()
-            items.append(
+            neural_items.append(
                 Item(
                     text=self.item_id_to_content[item_id],
                     id=item_id,
@@ -913,8 +969,59 @@ class HypecoderGraphRetrieverBM25(BaseRetriever):
                     type="hypecoder_graph_retriever",
                 )
             )
+        
+        if not (self.rrf_bm25 or self.rrf_dph):
+            return sorted(neural_items, key=lambda x: x.score, reverse=True)
+        
+        # ------------
+        # RRF
+        # ------------
+        neural_items.reverse()
+        neural_ranks = {item.id: rank + 1 for rank, item in enumerate(neural_items)}
+        if (self.seed_bm25):
+            if (self.rrf_bm25):
+                bm25_ranks = {doc_id: rank + 1 for rank, doc_id in enumerate(self.top_item_ids)}
+            if (self.rrf_dph):
+                dph_ranks = {doc_id: rank + 1 for rank, doc_id in enumerate(self.query(query.text), retriever="dph")}
+        elif (self.seed_dph):
+            if (self.rrf_bm25):
+                bm25_ranks = {doc_id: rank + 1 for rank, doc_id in enumerate(self.query(query.text), retriever="bm25")}
+            if (self.rrf_dph):
+                dph_ranks = {doc_id: rank + 1 for rank, doc_id in enumerate(self.top_item_ids)} 
+        else:
+            if (self.rrf_bm25):
+                bm25_ranks = {doc_id: rank + 1 for rank, doc_id in enumerate(self.query(query.text), retriever="bm25")}
+            if (self.rrf_dph):
+                dph_ranks = {doc_id: rank + 1 for rank, doc_id in enumerate(self.query(query.text), retriever="dph")}
 
-        return sorted(items, key=lambda x: x.score, reverse=True)
+        combined_items = []
+
+        for neural_item in neural_items:
+            
+            if (self.rrf_bm25):
+                bm25_rank = bm25_ranks.get(neural_item.id, 1000)
+            if (self.rrf_dph):
+                dph_rank = dph_ranks.get(neural_item.id, 1000)
+
+            k = 60
+            neural_rank = neural_ranks[neural_item.id]
+            if (self.rrf_bm25 and self.rrf_dph):
+                rrf_score = self.alpha * (1 / (k + neural_rank)) + (1 - self.alpha) * 0.5 * ((1 / (k + bm25_rank)) + (1 / (k + dph_rank)))
+            elif (self.rrf_bm25):
+                rrf_score = self.alpha * (1 / (k + neural_rank)) + (1 - self.alpha) * (1 / (k + bm25_rank))
+            elif (self.rrf_dph):
+                rrf_score = self.alpha * (1 / (k + neural_rank)) + (1 - self.alpha) * (1 / (k + dph_rank))
+
+            combined_items.append(
+                Item(
+                    text=neural_item.text,
+                    id=neural_item.id,
+                    score=rrf_score,
+                    type="hypecoder_graph_retriever",
+                    )
+            )
+
+        return sorted(combined_items, key=lambda x: x.score, reverse=True)[:top_k]
 
 
 class HypecoderGraphRetrieverHybrid(BaseRetriever):
