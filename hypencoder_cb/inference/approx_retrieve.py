@@ -863,14 +863,14 @@ class HypecoderGraphRetrieverNew(BaseRetriever):
 
     def _set_entry_points_similar(self, query):
 
-        top_item_ids = self.query(query)
+        self.top_item_ids = self.query(query)
         self.entry_point_indices = torch.tensor(
-            [self.item_id_to_index[item_id] for item_id in top_item_ids],
+            [self.item_id_to_index[item_id] for item_id in self.top_item_ids],
             dtype=torch.long,
             device=self.device
         )
         self.entry_point_embeddings = self.encoded_item_embeddings[self.entry_point_indices]
-        self.entry_point_ids = top_item_ids
+        self.entry_point_ids = self.top_item_ids
 
         print(f"Selected {len(self.entry_point_ids)} query-conditioned entry points")
 
