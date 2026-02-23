@@ -786,9 +786,6 @@ class HypecoderGraphRetrieverNew(BaseRetriever):
         Returns:
             List of document IDs for the n most relevant documents
         """
-
-        if (self.seed_bm25 and self.seed_dph):
-            raise ValueError("Cannot seed with both bm25 and dph")
         
         df = pt.new.queries(query)
 
@@ -796,14 +793,25 @@ class HypecoderGraphRetrieverNew(BaseRetriever):
             if self.bm25_retriever is None:
                 raise ValueError("No index loaded.")
             results = self.bm25_retriever.transform(df)
+
         elif (retriever == "dph"):
             if self.dph_retriever is None:
                 raise ValueError("No index loaded.")
             results = self.dph_retriever.transform(df)
+
+        elif (self.seed_bm25 and self.seed_dph):
+            if self.bm25_retriever is None or self.dph_retriever is None:
+                raise ValueError("No index loaded.")
+            bm25_results = self.bm25_retriever.transform(df)
+            dph_results = self.dph_retriever.transform(df)
+            combined = pd.concat([bm25_results, dph_results])
+            results = combined.drop_duplicates(subset="docno")
+
         elif (self.seed_bm25):
             if self.bm25_retriever is None:
                 raise ValueError("No index loaded.")
             results = self.bm25_retriever.transform(df)
+
         elif (self.seed_dph):
             if self.dph_retriever is None:
                 raise ValueError("No index loaded.")

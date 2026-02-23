@@ -49,7 +49,7 @@ def main(
     # -----------
     # test9: Different values of k1, b for BM25 seeding
     # -----------
-    output_dir = "retrievals/test9"
+    output_dir = "retrievals/test9-3090"
     ret_name=output_dir.split("/")[-1]
     k1_values = [0.5, 0.9, 1.2, 1.5, 2.0, 2.5]
     b_values = [0.3, 0.5, 0.75, 0.8, 1.0] 
@@ -117,7 +117,7 @@ def main(
     # -----------
     # test10: Test dph seeding
     # -----------
-    output_dir = "retrievals/test10"
+    output_dir = "retrievals/test10-3090"
     ret_name=output_dir.split("/")[-1]
     nep = [1_000, 2_048, 5_000, 10_000, 50_000, 100_000]
     nc = [6, 12, 18, 24, 64, 150]
@@ -181,7 +181,7 @@ def main(
     # -----------
     # test11: Test different k1, b values for seeding and rrf with BM25
     # -----------
-    output_dir = "retrievals/test11"
+    output_dir = "retrievals/test11-3090"
     ret_name=output_dir.split("/")[-1]
     k1_values = [0.5, 0.9, 1.2, 1.5, 2.0, 2.5]
     b_values = [0.3, 0.5, 0.75, 0.8, 1.0]
@@ -251,7 +251,7 @@ def main(
     # -----------
     # test12: Test different k1, b values for seeding W/ BM25 and rrh with dph
     # -----------
-    output_dir = "retrievals/test12"
+    output_dir = "retrievals/test12-3090"
     ret_name=output_dir.split("/")[-1]
     k1_values = [0.5, 0.9, 1.2, 1.5, 2.0, 2.5]
     b_values = [0.3, 0.5, 0.75, 0.8, 1.0]
@@ -322,7 +322,7 @@ def main(
     # -----------
     # test13: Test different k1, b values for seeding W/ BM25 and rrh with dph and BM25
     # -----------
-    output_dir = "retrievals/test13"
+    output_dir = "retrievals/test13-3090"
     ret_name=output_dir.split("/")[-1]
     k1_values = [0.5, 0.9, 1.2, 1.5, 2.0, 2.5]
     b_values = [0.3, 0.5, 0.75, 0.8, 1.0]
@@ -391,7 +391,7 @@ def main(
     # -----------
     # test14: Test different random seeds compared to original
     # -----------
-    output_dir = "retrievals/test14"
+    output_dir = "retrievals/test14-3090"
     ret_name=output_dir.split("/")[-1]
     params = [[100_000, 328, 20], [10_000, 64, 16]]
     seeds = [x for x in range(30,60)]
@@ -447,6 +447,73 @@ def main(
                 row.update(metrics)
 
                 writer.writerow(row)
+    print("Done :)")
+
+
+    # -----------
+    # test15: Test dph + bm25 combined seeding
+    # -----------
+    output_dir = "retrievals/test15-3090"
+    ret_name=output_dir.split("/")[-1]
+    nep = [750, 1_000, 2_048, 5_000, 10_000, 50_000]
+    nc = [6, 12, 18, 24, 64, 150]
+    mi = [3,4,5,6,12,16]
+    k1, b = 0.5, 0.75
+
+
+
+
+    for num_entry_points, ncandidates, max_iter in product(nep, nc, mi):
+
+        metric_dir=f"metrics/{ret_name}/entries/{num_entry_points}-{ncandidates}-{max_iter}"
+
+        retriever.set_parameters(
+            num_entry_points=num_entry_points,
+            ncandidates=ncandidates,
+            max_iter=max_iter,
+            seed_bm25=True,
+            seed_dph=True,
+            rrf_bm25=False,
+            rrf_dph=False,
+            k1=k1,
+            b=b
+        )
+
+        print(f"Starting retrieval: num_entry_points={num_entry_points}, ncandidates={ncandidates}, max_iter={max_iter}, k1={k1}, b={b}")
+        
+        do_retrieval(
+            retriever=retriever,
+            model_name_or_path=model_name_or_path,
+            encoded_item_path=encoded_item_path,
+            item_neighbors_path=item_neighbors_path,
+            output_dir=output_dir,
+            ir_dataset_name=ir_dataset_name,
+            dtype=dtype,
+            num_entry_points=num_entry_points,
+            ncandidates=ncandidates,
+            max_iter=max_iter,
+            cache_file=cache_file,
+            metric_dir=metric_dir
+        )
+
+
+    print("Combining metrics.")
+    fieldnames = ["NumEntryPoints", "NCandidates", "MaxIter",
+              "P@10", "P@5", "R@10", "R@1000",
+              "RR", "RR@10", "nDCG@10", "nDCG@5"]
+    with open(f"metrics/{ret_name}/results.csv", "w", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=fieldnames)
+        writer.writeheader()
+        for num_entry_points, ncandidates, max_iter in product(nep, nc, mi):
+            metric_dir=f"metrics/{ret_name}/entries/{num_entry_points}-{ncandidates}-{max_iter}/aggregated_metrics.json"
+
+            with open(metric_dir, "r") as g:
+                metrics = json.load(g)
+
+            row = {"NumEntryPoints": num_entry_points, "NCandidates": ncandidates, "MaxIter": max_iter}
+            row.update(metrics)
+
+            writer.writerow(row)
     print("Done :)")
 
     
