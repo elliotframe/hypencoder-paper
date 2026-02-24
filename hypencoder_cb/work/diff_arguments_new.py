@@ -450,22 +450,91 @@ def main(
     # print("Done :)")
 
 
+    # # -----------
+    # # test15: Test dph + bm25 combined seeding
+    # # -----------
+    # output_dir = "retrievals/test15-3090"
+    # ret_name=output_dir.split("/")[-1]
+    # nep = [750, 1_000, 2_048, 5_000, 10_000, 50_000]
+    # nc = [6, 12, 18, 24, 64, 150]
+    # mi = [3,4,5,6,12,16]
+    # k1, b = 0.5, 0.75
+
+
+
+
+    # for num_entry_points, ncandidates, max_iter in product(nep, nc, mi):
+
+    #     metric_dir=f"metrics/{ret_name}/entries/{num_entry_points}-{ncandidates}-{max_iter}"
+
+    #     retriever.set_parameters(
+    #         num_entry_points=num_entry_points,
+    #         ncandidates=ncandidates,
+    #         max_iter=max_iter,
+    #         seed_bm25=True,
+    #         seed_dph=True,
+    #         rrf_bm25=False,
+    #         rrf_dph=False,
+    #         k1=k1,
+    #         b=b
+    #     )
+
+    #     print(f"Starting retrieval: num_entry_points={num_entry_points}, ncandidates={ncandidates}, max_iter={max_iter}, k1={k1}, b={b}")
+        
+    #     do_retrieval(
+    #         retriever=retriever,
+    #         model_name_or_path=model_name_or_path,
+    #         encoded_item_path=encoded_item_path,
+    #         item_neighbors_path=item_neighbors_path,
+    #         output_dir=output_dir,
+    #         ir_dataset_name=ir_dataset_name,
+    #         dtype=dtype,
+    #         num_entry_points=num_entry_points,
+    #         ncandidates=ncandidates,
+    #         max_iter=max_iter,
+    #         cache_file=cache_file,
+    #         metric_dir=metric_dir
+    #     )
+
+
+    # print("Combining metrics.")
+    # fieldnames = ["NumEntryPoints", "NCandidates", "MaxIter",
+    #           "P@10", "P@5", "R@10", "R@1000",
+    #           "RR", "RR@10", "nDCG@10", "nDCG@5"]
+    # with open(f"metrics/{ret_name}/results.csv", "w", newline="") as f:
+    #     writer = csv.DictWriter(f, fieldnames=fieldnames)
+    #     writer.writeheader()
+    #     for num_entry_points, ncandidates, max_iter in product(nep, nc, mi):
+    #         metric_dir=f"metrics/{ret_name}/entries/{num_entry_points}-{ncandidates}-{max_iter}/aggregated_metrics.json"
+
+    #         with open(metric_dir, "r") as g:
+    #             metrics = json.load(g)
+
+    #         row = {"NumEntryPoints": num_entry_points, "NCandidates": ncandidates, "MaxIter": max_iter}
+    #         row.update(metrics)
+
+    #         writer.writerow(row)
+    # print("Done :)")
+
+
+
+     # -----------
+    # test16: Test dph + bm25 combined seeding, + rrf w/ bm25 and dph
     # -----------
-    # test15: Test dph + bm25 combined seeding
-    # -----------
-    output_dir = "retrievals/test15-3090"
+    output_dir = "retrievals/test16"
     ret_name=output_dir.split("/")[-1]
-    nep = [750, 1_000, 2_048, 5_000, 10_000, 50_000]
-    nc = [6, 12, 18, 24, 64, 150]
-    mi = [3,4,5,6,12,16]
+    nep = [750, 1_000, 2_048, 5_000]
+    nc = [6, 12]
+    mi = [3,4,5,6]
     k1, b = 0.5, 0.75
+    alpha_values = [0.91, 0.92, 0.93, 0.94]
 
 
 
 
-    for num_entry_points, ncandidates, max_iter in product(nep, nc, mi):
+    for num_entry_points, ncandidates, max_iter, alpha in product(nep, nc, mi, alpha_values):
 
-        metric_dir=f"metrics/{ret_name}/entries/{num_entry_points}-{ncandidates}-{max_iter}"
+        metric_dir=f"metrics/{ret_name}/entries/{num_entry_points}-{ncandidates}-{max_iter}-{alpha}"
 
         retriever.set_parameters(
             num_entry_points=num_entry_points,
@@ -473,13 +542,14 @@ def main(
             max_iter=max_iter,
             seed_bm25=True,
             seed_dph=True,
-            rrf_bm25=False,
-            rrf_dph=False,
+            rrf_bm25=True,
+            rrf_dph=True,
             k1=k1,
-            b=b
+            b=b,
+            alpha=alpha
         )
 
-        print(f"Starting retrieval: num_entry_points={num_entry_points}, ncandidates={ncandidates}, max_iter={max_iter}, k1={k1}, b={b}")
+        print(f"Starting retrieval: num_entry_points={num_entry_points}, ncandidates={ncandidates}, max_iter={max_iter}, k1={k1}, b={b}, alpha={alpha}")
         
         do_retrieval(
             retriever=retriever,
@@ -504,18 +574,21 @@ def main(
     with open(f"metrics/{ret_name}/results.csv", "w", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=fieldnames)
         writer.writeheader()
-        for num_entry_points, ncandidates, max_iter in product(nep, nc, mi):
-            metric_dir=f"metrics/{ret_name}/entries/{num_entry_points}-{ncandidates}-{max_iter}/aggregated_metrics.json"
+        for num_entry_points, ncandidates, max_iter, alpha in product(nep, nc, mi, alpha_values):
+            metric_dir=f"metrics/{ret_name}/entries/{num_entry_points}-{ncandidates}-{max_iter}-{alpha}/aggregated_metrics.json"
 
             with open(metric_dir, "r") as g:
                 metrics = json.load(g)
 
-            row = {"NumEntryPoints": num_entry_points, "NCandidates": ncandidates, "MaxIter": max_iter}
+            row = {"NumEntryPoints": num_entry_points, "NCandidates": ncandidates, "MaxIter": max_iter, "alpha": alpha}
             row.update(metrics)
 
             writer.writerow(row)
     print("Done :)")
 
+    
+
+    
     
 
     
