@@ -377,6 +377,7 @@ def do_retrieval(
     do_eval: bool = True,
     metric_names: Optional[List[str]] = None,
     ignore_same_id: bool = False,
+    metric_dir: Optional[str] = None,
 ) -> None:
     """Does retrieval and optionally evaluation.
 
@@ -451,6 +452,7 @@ def do_retrieval(
         include_content=include_content,
         do_eval=do_eval,
         metric_names=metric_names,
+        metric_dir=metric_dir,
     )
 
 
