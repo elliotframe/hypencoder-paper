@@ -432,6 +432,7 @@ def do_retrieval(
     retriever_kwargs = retriever_kwargs if retriever_kwargs is not None else {}
 
     do_retrieval_shared(
+        retriever=None,
         retriever_cls=HypencoderRetriever,
         retriever_kwargs=dict(
             model_name_or_path=model_name_or_path,
