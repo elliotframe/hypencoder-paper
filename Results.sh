@@ -4,7 +4,7 @@ export MODEL_NAME_OR_PATH="jfkback/hypencoder.6_layer"
 export ENCODING_PATH="~/nfs/hypencoder-paper/encodings/msmarco"
 export RETRIEVAL_DIR="retrievals/exhaustive/in-domain/2019"
 export IR_DATASET_NAME="msmarco-passage/trec-dl-2019/judged"
-export METRIC_NAME=f"metrics/exhaustive/in-domain/2019"
+export METRIC_NAME="metrics/exhaustive/in-domain/2019"
 
 python hypencoder_cb/inference/retrieve.py \
 --model_name_or_path=$MODEL_NAME_OR_PATH \
@@ -23,7 +23,7 @@ export MODEL_NAME_OR_PATH="jfkback/hypencoder.6_layer"
 export ENCODING_PATH="~/nfs/hypencoder-paper/encodings/msmarco"
 export RETRIEVAL_DIR="retrievals/exhaustive/in-domain/2020"
 export IR_DATASET_NAME="msmarco-passage/trec-dl-2020/judged"
-export METRIC_NAME=f"metrics/exhaustive/in-domain/2020"
+export METRIC_NAME="metrics/exhaustive/in-domain/2020"
 
 python hypencoder_cb/inference/retrieve.py \
 --model_name_or_path=$MODEL_NAME_OR_PATH \
@@ -41,7 +41,7 @@ export MODEL_NAME_OR_PATH="jfkback/hypencoder.6_layer"
 export ENCODING_PATH="~/nfs/hypencoder-paper/encodings/msmarco"
 export RETRIEVAL_DIR="retrievals/exhaustive/in-domain/dev"
 export IR_DATASET_NAME="msmarco-passage/dev/small"
-export METRIC_NAME=f"metrics/exhaustive/in-domain/dev"
+export METRIC_NAME="metrics/exhaustive/in-domain/dev"
 
 python hypencoder_cb/inference/retrieve.py \
 --model_name_or_path=$MODEL_NAME_OR_PATH \
@@ -61,7 +61,7 @@ export MODEL_NAME_OR_PATH="jfkback/hypencoder.6_layer"
 export ENCODING_PATH="~/nfs/hypencoder-paper/encodings/fiqaTest"
 export RETRIEVAL_DIR="retrievals/exhaustive/out-domain/fiqaTest"
 export IR_DATASET_NAME="beir/fiqa/test"
-export METRIC_NAME=f"metrics/exhaustive/out-domain/fiqaTest"
+export METRIC_NAME="metrics/exhaustive/out-domain/fiqaTest"
 
 python hypencoder_cb/inference/retrieve.py \
 --model_name_or_path=$MODEL_NAME_OR_PATH \
@@ -80,7 +80,7 @@ export MODEL_NAME_OR_PATH="jfkback/hypencoder.6_layer"
 export ENCODING_PATH="~/nfs/hypencoder-paper/encodings/treccovid"
 export RETRIEVAL_DIR="retrievals/exhaustive/out-domain/treccovid"
 export IR_DATASET_NAME="beir/trec-covid"
-export METRIC_NAME=f"metrics/exhaustive/out-domain/treccovid"
+export METRIC_NAME="metrics/exhaustive/out-domain/treccovid"
 
 python hypencoder_cb/inference/retrieve.py \
 --model_name_or_path=$MODEL_NAME_OR_PATH \
@@ -98,7 +98,7 @@ export MODEL_NAME_OR_PATH="jfkback/hypencoder.6_layer"
 export ENCODING_PATH="~/nfs/hypencoder-paper/encodings/nfcorpusTest"
 export RETRIEVAL_DIR="retrievals/exhaustive/out-domain/nfcorpus"
 export IR_DATASET_NAME="beir/nfcorpus/test"
-export METRIC_NAME=f"metrics/exhaustive/out-domain/nfcorpus"
+export METRIC_NAME="metrics/exhaustive/out-domain/nfcorpus"
 
 python hypencoder_cb/inference/retrieve.py \
 --model_name_or_path=$MODEL_NAME_OR_PATH \
@@ -116,7 +116,7 @@ export MODEL_NAME_OR_PATH="jfkback/hypencoder.6_layer"
 export ENCODING_PATH="~/nfs/hypencoder-paper/encodings/dpedia-entityTest"
 export RETRIEVAL_DIR="retrievals/exhaustive/out-domain/dpedia"
 export IR_DATASET_NAME="beir/dbpedia-entity/test"
-export METRIC_NAME=f"metrics/exhaustive/out-domain/dpedia"
+export METRIC_NAME="metrics/exhaustive/out-domain/dpedia"
 
 python hypencoder_cb/inference/retrieve.py \
 --model_name_or_path=$MODEL_NAME_OR_PATH \
@@ -134,7 +134,7 @@ export MODEL_NAME_OR_PATH="jfkback/hypencoder.6_layer"
 export ENCODING_PATH="~/nfs/hypencoder-paper/encodings/touche2020v2"
 export RETRIEVAL_DIR="retrievals/exhaustive/out-domain/touche"
 export IR_DATASET_NAME="beir/webis-touche2020/v2"
-export METRIC_NAME=f"metrics/exhaustive/out-domain/touche"
+export METRIC_NAME="metrics/exhaustive/out-domain/touche"
 
 python hypencoder_cb/inference/retrieve.py \
 --model_name_or_path=$MODEL_NAME_OR_PATH \
@@ -153,7 +153,7 @@ export MODEL_NAME_OR_PATH="jfkback/hypencoder.2_layer"
 export ENCODING_PATH="~/nfs/hypencoder-paper/encodings/msmarco"
 export RETRIEVAL_DIR="retrievals/exhaustive/layers/2/2019"
 export IR_DATASET_NAME="msmarco-passage/trec-dl-2019/judged"
-export METRIC_NAME=f"metrics/exhaustive/layers/2/2019"
+export METRIC_NAME="metrics/exhaustive/layers/2/2019"
 
 python hypencoder_cb/inference/retrieve.py \
 --model_name_or_path=$MODEL_NAME_OR_PATH \
@@ -171,7 +171,7 @@ export MODEL_NAME_OR_PATH="jfkback/hypencoder.4_layer"
 export ENCODING_PATH="~/nfs/hypencoder-paper/encodings/msmarco"
 export RETRIEVAL_DIR="retrievals/exhaustive/layers/4/2019"
 export IR_DATASET_NAME="msmarco-passage/trec-dl-2019/judged"
-export METRIC_NAME=f"metrics/exhaustive/layers/4/2019"
+export METRIC_NAME="metrics/exhaustive/layers/4/2019"
 
 python hypencoder_cb/inference/retrieve.py \
 --model_name_or_path=$MODEL_NAME_OR_PATH \
@@ -189,7 +189,7 @@ export MODEL_NAME_OR_PATH="jfkback/hypencoder.8_layer"
 export ENCODING_PATH="~/nfs/hypencoder-paper/encodings/msmarco"
 export RETRIEVAL_DIR="retrievals/exhaustive/layers/8/2019"
 export IR_DATASET_NAME="msmarco-passage/trec-dl-2019/judged"
-export METRIC_NAME=f"metrics/exhaustive/layers/8/2019"
+export METRIC_NAME="metrics/exhaustive/layers/8/2019"
 
 python hypencoder_cb/inference/retrieve.py \
 --model_name_or_path=$MODEL_NAME_OR_PATH \
@@ -207,7 +207,7 @@ export MODEL_NAME_OR_PATH="jfkback/hypencoder.2_layer"
 export ENCODING_PATH="~/nfs/hypencoder-paper/encodings/msmarco"
 export RETRIEVAL_DIR="retrievals/exhaustive/layers/2/2020"
 export IR_DATASET_NAME="msmarco-passage/trec-dl-2020/judged"
-export METRIC_NAME=f"metrics/exhaustive/layers/2/2020"
+export METRIC_NAME="metrics/exhaustive/layers/2/2020"
 
 python hypencoder_cb/inference/retrieve.py \
 --model_name_or_path=$MODEL_NAME_OR_PATH \
@@ -225,7 +225,7 @@ export MODEL_NAME_OR_PATH="jfkback/hypencoder.4_layer"
 export ENCODING_PATH="~/nfs/hypencoder-paper/encodings/msmarco"
 export RETRIEVAL_DIR="retrievals/exhaustive/layers/4/2020"
 export IR_DATASET_NAME="msmarco-passage/trec-dl-2020/judged"
-export METRIC_NAME=f"metrics/exhaustive/layers/4/2020"
+export METRIC_NAME="metrics/exhaustive/layers/4/2020"
 
 python hypencoder_cb/inference/retrieve.py \
 --model_name_or_path=$MODEL_NAME_OR_PATH \
@@ -243,7 +243,7 @@ export MODEL_NAME_OR_PATH="jfkback/hypencoder.8_layer"
 export ENCODING_PATH="~/nfs/hypencoder-paper/encodings/msmarco"
 export RETRIEVAL_DIR="retrievals/exhaustive/layers/8/2020"
 export IR_DATASET_NAME="msmarco-passage/trec-dl-2020/judged"
-export METRIC_NAME=f"metrics/exhaustive/layers/8/2020"
+export METRIC_NAME="metrics/exhaustive/layers/8/2020"
 
 python hypencoder_cb/inference/retrieve.py \
 --model_name_or_path=$MODEL_NAME_OR_PATH \
