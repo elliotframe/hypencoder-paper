@@ -587,79 +587,79 @@ def main(
     # print("Done :)")
 
 
-    # -----------
-    # test17: Test different k1, b values for rrf with BM25
-    # -----------
-    output_dir = "retrievals/test17"
-    ret_name=output_dir.split("/")[-1]
-    k1_values = [0.5, 0.9, 1.2, 1.5, 2.0, 2.5]
-    b_values = [0.3, 0.5, 0.75, 0.8, 1.0]
-    alpha_values = [0.90, 0.91, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99]
-    num_entry_points = 1000
-    ncandidates = 6
-    max_iter = 4
+    # # -----------
+    # # test17: Test different k1, b values for rrf with BM25
+    # # -----------
+    # output_dir = "retrievals/test17"
+    # ret_name=output_dir.split("/")[-1]
+    # k1_values = [0.5, 0.9, 1.2, 1.5, 2.0, 2.5]
+    # b_values = [0.3, 0.5, 0.75, 0.8, 1.0]
+    # alpha_values = [0.90, 0.91, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99]
+    # num_entry_points = 1000
+    # ncandidates = 6
+    # max_iter = 4
 
 
-    for k1, b, alpha in product(k1_values, b_values, alpha_values):
+    # for k1, b, alpha in product(k1_values, b_values, alpha_values):
 
-        metric_dir=f"metrics/{ret_name}/entries/{k1}-{b}-{alpha}"
+    #     metric_dir=f"metrics/{ret_name}/entries/{k1}-{b}-{alpha}"
 
-        retriever.set_parameters(
-            num_entry_points=num_entry_points,
-            ncandidates=ncandidates,
-            max_iter=max_iter,
-            seed_bm25=False,
-            seed_dph=False,
-            rrf_bm25=True,
-            rrf_dph=False,
-            k1=k1,
-            b=b,
-            alpha=alpha,
-        )
+    #     retriever.set_parameters(
+    #         num_entry_points=num_entry_points,
+    #         ncandidates=ncandidates,
+    #         max_iter=max_iter,
+    #         seed_bm25=False,
+    #         seed_dph=False,
+    #         rrf_bm25=True,
+    #         rrf_dph=False,
+    #         k1=k1,
+    #         b=b,
+    #         alpha=alpha,
+    #     )
 
-        print(f"Starting retrieval: num_entry_points={num_entry_points}, ncandidates={ncandidates}, max_iter={max_iter}, k1={k1}, b={b}, alpha={alpha}")
+    #     print(f"Starting retrieval: num_entry_points={num_entry_points}, ncandidates={ncandidates}, max_iter={max_iter}, k1={k1}, b={b}, alpha={alpha}")
         
-        do_retrieval(
-            retriever=retriever,
-            model_name_or_path=model_name_or_path,
-            encoded_item_path=encoded_item_path,
-            item_neighbors_path=item_neighbors_path,
-            output_dir=output_dir,
-            ir_dataset_name=ir_dataset_name,
-            dtype=dtype,
-            num_entry_points=num_entry_points,
-            ncandidates=ncandidates,
-            max_iter=max_iter,
-            cache_file=cache_file,
-            metric_dir=metric_dir
-        )
+    #     do_retrieval(
+    #         retriever=retriever,
+    #         model_name_or_path=model_name_or_path,
+    #         encoded_item_path=encoded_item_path,
+    #         item_neighbors_path=item_neighbors_path,
+    #         output_dir=output_dir,
+    #         ir_dataset_name=ir_dataset_name,
+    #         dtype=dtype,
+    #         num_entry_points=num_entry_points,
+    #         ncandidates=ncandidates,
+    #         max_iter=max_iter,
+    #         cache_file=cache_file,
+    #         metric_dir=metric_dir
+    #     )
 
 
-    print("Combining metrics.")
-    fieldnames = ["k1", "b", "alpha", "NumEntryPoints", "NCandidates", "MaxIter",
-              "P@10", "P@5", "R@10", "R@1000",
-              "RR", "RR@10", "nDCG@10", "nDCG@5"]
-    with open(f"metrics/{ret_name}/results.csv", "w", newline="") as f:
-        writer = csv.DictWriter(f, fieldnames=fieldnames)
-        writer.writeheader()
-        for k1, b, alpha in product(k1_values, b_values, alpha_values):
-            metric_dir=f"metrics/{ret_name}/entries/{k1}-{b}-{alpha}/aggregated_metrics.json"
+    # print("Combining metrics.")
+    # fieldnames = ["k1", "b", "alpha", "NumEntryPoints", "NCandidates", "MaxIter",
+    #           "P@10", "P@5", "R@10", "R@1000",
+    #           "RR", "RR@10", "nDCG@10", "nDCG@5"]
+    # with open(f"metrics/{ret_name}/results.csv", "w", newline="") as f:
+    #     writer = csv.DictWriter(f, fieldnames=fieldnames)
+    #     writer.writeheader()
+    #     for k1, b, alpha in product(k1_values, b_values, alpha_values):
+    #         metric_dir=f"metrics/{ret_name}/entries/{k1}-{b}-{alpha}/aggregated_metrics.json"
 
-            with open(metric_dir, "r") as g:
-                metrics = json.load(g)
+    #         with open(metric_dir, "r") as g:
+    #             metrics = json.load(g)
 
-            row = {"k1": k1, "b":b, "alpha":alpha, "NumEntryPoints": num_entry_points, "NCandidates": ncandidates, "MaxIter": max_iter}
-            row.update(metrics)
+    #         row = {"k1": k1, "b":b, "alpha":alpha, "NumEntryPoints": num_entry_points, "NCandidates": ncandidates, "MaxIter": max_iter}
+    #         row.update(metrics)
 
-            writer.writerow(row)
-    print("Done :)")
-
-
+    #         writer.writerow(row)
+    # print("Done :)")
 
 
-      # -----------
-    # test18: Test different alpha values for rrf with dph
-    # -----------
+
+
+    #   # -----------
+    # # test18: Test different alpha values for rrf with dph
+    # # -----------
     output_dir = "retrievals/test18"
     ret_name=output_dir.split("/")[-1]
     alpha_values = [0.90, 0.91, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99]
@@ -668,39 +668,39 @@ def main(
     max_iter = 4
 
 
-    for alpha in alpha_values:
+    # for alpha in alpha_values:
 
-        metric_dir=f"metrics/{ret_name}/entries/{alpha}"
+    #     metric_dir=f"metrics/{ret_name}/entries/{alpha}"
 
-        retriever.set_parameters(
-            num_entry_points=num_entry_points,
-            ncandidates=ncandidates,
-            max_iter=max_iter,
-            seed_bm25=False,
-            seed_dph=False,
-            rrf_bm25=False,
-            rrf_dph=True,
-            k1=k1,
-            b=b,
-            alpha=alpha,
-        )
+    #     retriever.set_parameters(
+    #         num_entry_points=num_entry_points,
+    #         ncandidates=ncandidates,
+    #         max_iter=max_iter,
+    #         seed_bm25=False,
+    #         seed_dph=False,
+    #         rrf_bm25=False,
+    #         rrf_dph=True,
+    #         k1=k1,
+    #         b=b,
+    #         alpha=alpha,
+    #     )
 
-        print(f"Starting retrieval: num_entry_points={num_entry_points}, ncandidates={ncandidates}, max_iter={max_iter}, alpha={alpha}")
+    #     print(f"Starting retrieval: num_entry_points={num_entry_points}, ncandidates={ncandidates}, max_iter={max_iter}, alpha={alpha}")
         
-        do_retrieval(
-            retriever=retriever,
-            model_name_or_path=model_name_or_path,
-            encoded_item_path=encoded_item_path,
-            item_neighbors_path=item_neighbors_path,
-            output_dir=output_dir,
-            ir_dataset_name=ir_dataset_name,
-            dtype=dtype,
-            num_entry_points=num_entry_points,
-            ncandidates=ncandidates,
-            max_iter=max_iter,
-            cache_file=cache_file,
-            metric_dir=metric_dir
-        )
+    #     do_retrieval(
+    #         retriever=retriever,
+    #         model_name_or_path=model_name_or_path,
+    #         encoded_item_path=encoded_item_path,
+    #         item_neighbors_path=item_neighbors_path,
+    #         output_dir=output_dir,
+    #         ir_dataset_name=ir_dataset_name,
+    #         dtype=dtype,
+    #         num_entry_points=num_entry_points,
+    #         ncandidates=ncandidates,
+    #         max_iter=max_iter,
+    #         cache_file=cache_file,
+    #         metric_dir=metric_dir
+    #     )
 
 
     print("Combining metrics.")
@@ -711,7 +711,7 @@ def main(
         writer = csv.DictWriter(f, fieldnames=fieldnames)
         writer.writeheader()
         for alpha in alpha_values:
-            metric_dir=f"metrics/{ret_name}/entries/{k1}-{b}-{alpha}/aggregated_metrics.json"
+            metric_dir=f"metrics/{ret_name}/entries/{alpha}/aggregated_metrics.json"
 
             with open(metric_dir, "r") as g:
                 metrics = json.load(g)
