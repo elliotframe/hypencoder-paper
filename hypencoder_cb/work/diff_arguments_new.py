@@ -666,6 +666,7 @@ def main(
     num_entry_points = 10000
     ncandidates = 64
     max_iter = 16
+    k1, b = 0.5, 0.5
 
 
     for alpha in alpha_values:
