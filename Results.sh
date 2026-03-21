@@ -1,40 +1,40 @@
 
-# # Exhaustive 2019
-# export MODEL_NAME_OR_PATH="jfkback/hypencoder.6_layer"
-# export ENCODING_PATH="~/nfs/hypencoder-paper/encodings/msmarco"
-# export RETRIEVAL_DIR="retrievals/exhaustive/in-domain/2019"
-# export IR_DATASET_NAME="msmarco-passage/trec-dl-2019/judged"
-# export METRIC_NAME="metrics/exhaustive/in-domain/2019"
+# Exhaustive 2019
+export MODEL_NAME_OR_PATH="jfkback/hypencoder.6_layer"
+export ENCODING_PATH="~/nfs/hypencoder-paper/encodings/msmarco"
+export RETRIEVAL_DIR="retrievals/exhaustive/in-domain/2019-new"
+export IR_DATASET_NAME="msmarco-passage/trec-dl-2019/judged"
+export METRIC_NAME="metrics/exhaustive/in-domain/2019-new"
 
-# python hypencoder_cb/inference/retrieve.py \
-# --model_name_or_path=$MODEL_NAME_OR_PATH \
-# --encoded_item_path=$ENCODING_PATH \
-# --output_dir=$RETRIEVAL_DIR \
-# --ir_dataset_name=$IR_DATASET_NAME \
-# --query_max_length=64 \
-# --metric_dir=$METRIC_NAME
+python hypencoder_cb/inference/retrieve.py \
+--model_name_or_path=$MODEL_NAME_OR_PATH \
+--encoded_item_path=$ENCODING_PATH \
+--output_dir=$RETRIEVAL_DIR \
+--ir_dataset_name=$IR_DATASET_NAME \
+--query_max_length=64 \
+--metric_dir=$METRIC_NAME
 
-# python hypencoder_cb/work/add_timings_exhaustive.py \
-# --ret_name="exhaustive/in-domain/2019"
+python hypencoder_cb/work/add_timings_exhaustive.py \
+--ret_name="exhaustive/in-domain/2019-new"
 
 
-# # Exhaustive 2020
-# export MODEL_NAME_OR_PATH="jfkback/hypencoder.6_layer"
-# export ENCODING_PATH="~/nfs/hypencoder-paper/encodings/msmarco"
-# export RETRIEVAL_DIR="retrievals/exhaustive/in-domain/2020"
-# export IR_DATASET_NAME="msmarco-passage/trec-dl-2020/judged"
-# export METRIC_NAME="metrics/exhaustive/in-domain/2020"
+# Exhaustive 2020
+export MODEL_NAME_OR_PATH="jfkback/hypencoder.6_layer"
+export ENCODING_PATH="~/nfs/hypencoder-paper/encodings/msmarco"
+export RETRIEVAL_DIR="retrievals/exhaustive/in-domain/2020-new"
+export IR_DATASET_NAME="msmarco-passage/trec-dl-2020/judged"
+export METRIC_NAME="metrics/exhaustive/in-domain/2020-new"
 
-# python hypencoder_cb/inference/retrieve.py \
-# --model_name_or_path=$MODEL_NAME_OR_PATH \
-# --encoded_item_path=$ENCODING_PATH \
-# --output_dir=$RETRIEVAL_DIR \
-# --ir_dataset_name=$IR_DATASET_NAME \
-# --query_max_length=64 \
-# --metric_dir=$METRIC_NAME
+python hypencoder_cb/inference/retrieve.py \
+--model_name_or_path=$MODEL_NAME_OR_PATH \
+--encoded_item_path=$ENCODING_PATH \
+--output_dir=$RETRIEVAL_DIR \
+--ir_dataset_name=$IR_DATASET_NAME \
+--query_max_length=64 \
+--metric_dir=$METRIC_NAME
 
-# python hypencoder_cb/work/add_timings_exhaustive.py \
-# --ret_name="exhaustive/in-domain/2020"
+python hypencoder_cb/work/add_timings_exhaustive.py \
+--ret_name="exhaustive/in-domain/2020-new"
 
 # # Exhaustive dev
 # export MODEL_NAME_OR_PATH="jfkback/hypencoder.6_layer"
@@ -148,113 +148,113 @@
 # --ret_name="exhaustive/out-domain/touche"
 
 
-# Exhaustive 2019 2
-export MODEL_NAME_OR_PATH="jfkback/hypencoder.2_layer"
-export ENCODING_PATH="~/nfs/hypencoder-paper/encodings/msmarco"
-export RETRIEVAL_DIR="retrievals/exhaustive/layers/2/2019"
-export IR_DATASET_NAME="msmarco-passage/trec-dl-2019/judged"
-export METRIC_NAME="metrics/exhaustive/layers/2/2019"
+# # Exhaustive 2019 2
+# export MODEL_NAME_OR_PATH="jfkback/hypencoder.2_layer"
+# export ENCODING_PATH="~/nfs/hypencoder-paper/encodings/msmarco"
+# export RETRIEVAL_DIR="retrievals/exhaustive/layers/2/2019"
+# export IR_DATASET_NAME="msmarco-passage/trec-dl-2019/judged"
+# export METRIC_NAME="metrics/exhaustive/layers/2/2019"
 
-python hypencoder_cb/inference/retrieve.py \
---model_name_or_path=$MODEL_NAME_OR_PATH \
---encoded_item_path=$ENCODING_PATH \
---output_dir=$RETRIEVAL_DIR \
---ir_dataset_name=$IR_DATASET_NAME \
---query_max_length=64 \
---metric_dir=$METRIC_NAME
+# python hypencoder_cb/inference/retrieve.py \
+# --model_name_or_path=$MODEL_NAME_OR_PATH \
+# --encoded_item_path=$ENCODING_PATH \
+# --output_dir=$RETRIEVAL_DIR \
+# --ir_dataset_name=$IR_DATASET_NAME \
+# --query_max_length=64 \
+# --metric_dir=$METRIC_NAME
 
-python hypencoder_cb/work/add_timings_exhaustive.py \
---ret_name="exhaustive/layers/2/2019"
+# python hypencoder_cb/work/add_timings_exhaustive.py \
+# --ret_name="exhaustive/layers/2/2019"
 
-# Exhaustive 2019 4
-export MODEL_NAME_OR_PATH="jfkback/hypencoder.4_layer"
-export ENCODING_PATH="~/nfs/hypencoder-paper/encodings/msmarco"
-export RETRIEVAL_DIR="retrievals/exhaustive/layers/4/2019"
-export IR_DATASET_NAME="msmarco-passage/trec-dl-2019/judged"
-export METRIC_NAME="metrics/exhaustive/layers/4/2019"
+# # Exhaustive 2019 4
+# export MODEL_NAME_OR_PATH="jfkback/hypencoder.4_layer"
+# export ENCODING_PATH="~/nfs/hypencoder-paper/encodings/msmarco"
+# export RETRIEVAL_DIR="retrievals/exhaustive/layers/4/2019"
+# export IR_DATASET_NAME="msmarco-passage/trec-dl-2019/judged"
+# export METRIC_NAME="metrics/exhaustive/layers/4/2019"
 
-python hypencoder_cb/inference/retrieve.py \
---model_name_or_path=$MODEL_NAME_OR_PATH \
---encoded_item_path=$ENCODING_PATH \
---output_dir=$RETRIEVAL_DIR \
---ir_dataset_name=$IR_DATASET_NAME \
---query_max_length=64 \
---metric_dir=$METRIC_NAME
+# python hypencoder_cb/inference/retrieve.py \
+# --model_name_or_path=$MODEL_NAME_OR_PATH \
+# --encoded_item_path=$ENCODING_PATH \
+# --output_dir=$RETRIEVAL_DIR \
+# --ir_dataset_name=$IR_DATASET_NAME \
+# --query_max_length=64 \
+# --metric_dir=$METRIC_NAME
 
-python hypencoder_cb/work/add_timings_exhaustive.py \
---ret_name="exhaustive/layers/4/2019"
+# python hypencoder_cb/work/add_timings_exhaustive.py \
+# --ret_name="exhaustive/layers/4/2019"
 
-# Exhaustive 2019 8
-export MODEL_NAME_OR_PATH="jfkback/hypencoder.8_layer"
-export ENCODING_PATH="~/nfs/hypencoder-paper/encodings/msmarco"
-export RETRIEVAL_DIR="retrievals/exhaustive/layers/8/2019"
-export IR_DATASET_NAME="msmarco-passage/trec-dl-2019/judged"
-export METRIC_NAME="metrics/exhaustive/layers/8/2019"
+# # Exhaustive 2019 8
+# export MODEL_NAME_OR_PATH="jfkback/hypencoder.8_layer"
+# export ENCODING_PATH="~/nfs/hypencoder-paper/encodings/msmarco"
+# export RETRIEVAL_DIR="retrievals/exhaustive/layers/8/2019"
+# export IR_DATASET_NAME="msmarco-passage/trec-dl-2019/judged"
+# export METRIC_NAME="metrics/exhaustive/layers/8/2019"
 
-python hypencoder_cb/inference/retrieve.py \
---model_name_or_path=$MODEL_NAME_OR_PATH \
---encoded_item_path=$ENCODING_PATH \
---output_dir=$RETRIEVAL_DIR \
---ir_dataset_name=$IR_DATASET_NAME \
---query_max_length=64 \
---metric_dir=$METRIC_NAME
+# python hypencoder_cb/inference/retrieve.py \
+# --model_name_or_path=$MODEL_NAME_OR_PATH \
+# --encoded_item_path=$ENCODING_PATH \
+# --output_dir=$RETRIEVAL_DIR \
+# --ir_dataset_name=$IR_DATASET_NAME \
+# --query_max_length=64 \
+# --metric_dir=$METRIC_NAME
 
-python hypencoder_cb/work/add_timings_exhaustive.py \
---ret_name="exhaustive/layers/8/2019"
+# python hypencoder_cb/work/add_timings_exhaustive.py \
+# --ret_name="exhaustive/layers/8/2019"
 
-# Exhaustive 2020 2
-export MODEL_NAME_OR_PATH="jfkback/hypencoder.2_layer"
-export ENCODING_PATH="~/nfs/hypencoder-paper/encodings/msmarco"
-export RETRIEVAL_DIR="retrievals/exhaustive/layers/2/2020"
-export IR_DATASET_NAME="msmarco-passage/trec-dl-2020/judged"
-export METRIC_NAME="metrics/exhaustive/layers/2/2020"
+# # Exhaustive 2020 2
+# export MODEL_NAME_OR_PATH="jfkback/hypencoder.2_layer"
+# export ENCODING_PATH="~/nfs/hypencoder-paper/encodings/msmarco"
+# export RETRIEVAL_DIR="retrievals/exhaustive/layers/2/2020"
+# export IR_DATASET_NAME="msmarco-passage/trec-dl-2020/judged"
+# export METRIC_NAME="metrics/exhaustive/layers/2/2020"
 
-python hypencoder_cb/inference/retrieve.py \
---model_name_or_path=$MODEL_NAME_OR_PATH \
---encoded_item_path=$ENCODING_PATH \
---output_dir=$RETRIEVAL_DIR \
---ir_dataset_name=$IR_DATASET_NAME \
---query_max_length=64 \
---metric_dir=$METRIC_NAME
+# python hypencoder_cb/inference/retrieve.py \
+# --model_name_or_path=$MODEL_NAME_OR_PATH \
+# --encoded_item_path=$ENCODING_PATH \
+# --output_dir=$RETRIEVAL_DIR \
+# --ir_dataset_name=$IR_DATASET_NAME \
+# --query_max_length=64 \
+# --metric_dir=$METRIC_NAME
 
-python hypencoder_cb/work/add_timings_exhaustive.py \
---ret_name="exhaustive/layers/2/2020"
+# python hypencoder_cb/work/add_timings_exhaustive.py \
+# --ret_name="exhaustive/layers/2/2020"
 
-# Exhaustive 2020 4
-export MODEL_NAME_OR_PATH="jfkback/hypencoder.4_layer"
-export ENCODING_PATH="~/nfs/hypencoder-paper/encodings/msmarco"
-export RETRIEVAL_DIR="retrievals/exhaustive/layers/4/2020"
-export IR_DATASET_NAME="msmarco-passage/trec-dl-2020/judged"
-export METRIC_NAME="metrics/exhaustive/layers/4/2020"
+# # Exhaustive 2020 4
+# export MODEL_NAME_OR_PATH="jfkback/hypencoder.4_layer"
+# export ENCODING_PATH="~/nfs/hypencoder-paper/encodings/msmarco"
+# export RETRIEVAL_DIR="retrievals/exhaustive/layers/4/2020"
+# export IR_DATASET_NAME="msmarco-passage/trec-dl-2020/judged"
+# export METRIC_NAME="metrics/exhaustive/layers/4/2020"
 
-python hypencoder_cb/inference/retrieve.py \
---model_name_or_path=$MODEL_NAME_OR_PATH \
---encoded_item_path=$ENCODING_PATH \
---output_dir=$RETRIEVAL_DIR \
---ir_dataset_name=$IR_DATASET_NAME \
---query_max_length=64 \
---metric_dir=$METRIC_NAME
+# python hypencoder_cb/inference/retrieve.py \
+# --model_name_or_path=$MODEL_NAME_OR_PATH \
+# --encoded_item_path=$ENCODING_PATH \
+# --output_dir=$RETRIEVAL_DIR \
+# --ir_dataset_name=$IR_DATASET_NAME \
+# --query_max_length=64 \
+# --metric_dir=$METRIC_NAME
 
-python hypencoder_cb/work/add_timings_exhaustive.py \
---ret_name="exhaustive/layers/4/2020"
+# python hypencoder_cb/work/add_timings_exhaustive.py \
+# --ret_name="exhaustive/layers/4/2020"
 
-# Exhaustive 2020 8
-export MODEL_NAME_OR_PATH="jfkback/hypencoder.8_layer"
-export ENCODING_PATH="~/nfs/hypencoder-paper/encodings/msmarco"
-export RETRIEVAL_DIR="retrievals/exhaustive/layers/8/2020"
-export IR_DATASET_NAME="msmarco-passage/trec-dl-2020/judged"
-export METRIC_NAME="metrics/exhaustive/layers/8/2020"
+# # Exhaustive 2020 8
+# export MODEL_NAME_OR_PATH="jfkback/hypencoder.8_layer"
+# export ENCODING_PATH="~/nfs/hypencoder-paper/encodings/msmarco"
+# export RETRIEVAL_DIR="retrievals/exhaustive/layers/8/2020"
+# export IR_DATASET_NAME="msmarco-passage/trec-dl-2020/judged"
+# export METRIC_NAME="metrics/exhaustive/layers/8/2020"
 
-python hypencoder_cb/inference/retrieve.py \
---model_name_or_path=$MODEL_NAME_OR_PATH \
---encoded_item_path=$ENCODING_PATH \
---output_dir=$RETRIEVAL_DIR \
---ir_dataset_name=$IR_DATASET_NAME \
---query_max_length=64 \
---metric_dir=$METRIC_NAME
+# python hypencoder_cb/inference/retrieve.py \
+# --model_name_or_path=$MODEL_NAME_OR_PATH \
+# --encoded_item_path=$ENCODING_PATH \
+# --output_dir=$RETRIEVAL_DIR \
+# --ir_dataset_name=$IR_DATASET_NAME \
+# --query_max_length=64 \
+# --metric_dir=$METRIC_NAME
 
-python hypencoder_cb/work/add_timings_exhaustive.py \
---ret_name="exhaustive/layers/8/2020"
+# python hypencoder_cb/work/add_timings_exhaustive.py \
+# --ret_name="exhaustive/layers/8/2020"
 
 
 
