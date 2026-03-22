@@ -9,27 +9,27 @@ import json
 from hypencoder_cb.utils.jsonl_utils import JsonlReader
 
 
-DEFAULT_METRICS = [
-    "nDCG@10",
-    "nDCG@5",
-    "P(rel=2)@10",
-    "P(rel=2)@5",
-    "R(rel=2)@10",
-    "MRR(rel=2)",
-    "R(rel=2)@1000",
-    "MRR(rel=2)@10",
-]
-
 # DEFAULT_METRICS = [
 #     "nDCG@10",
 #     "nDCG@5",
-#     "P@10",
-#     "P@5",
-#     "R@10",
-#     "MRR",
-#     "R@1000",
-#     "MRR@10",
+#     "P(rel=2)@10",
+#     "P(rel=2)@5",
+#     "R(rel=2)@10",
+#     "MRR(rel=2)",
+#     "R(rel=2)@1000",
+#     "MRR(rel=2)@10",
 # ]
+
+DEFAULT_METRICS = [
+    "nDCG@10",
+    "nDCG@5",
+    "P@10",
+    "P@5",
+    "R@10",
+    "MRR",
+    "R@1000",
+    "MRR@10",
+]
 
 
 def pretty_print_aggregated_metrics(
