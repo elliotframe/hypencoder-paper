@@ -590,7 +590,7 @@ def main(
     # -----------
     # test17: Test different k1, b values for rrf with BM25
     # -----------
-    output_dir = "retrievals/test17"
+    output_dir = "retrievals/test17-1"
     ret_name=output_dir.split("/")[-1]
     k1_values = [0.5, 0.9, 1.2, 1.5, 2.0, 2.5]
     b_values = [0.3, 0.5, 0.75, 0.8, 1.0]
@@ -660,7 +660,7 @@ def main(
     #   # -----------
     # # test18: Test different alpha values for rrf with dph
     # # -----------
-    output_dir = "retrievals/test18"
+    output_dir = "retrievals/test18-1"
     ret_name=output_dir.split("/")[-1]
     alpha_values = [0.80, 0.81, 0.82, 0.83, 0.84, 0.85, 0.86, 0.87, 0.88, 0.89]
     num_entry_points = 10000
@@ -728,7 +728,7 @@ def main(
     # -----------
     # test19: Test different k1, b values for rrf with BM25 and DPH
     # -----------
-    output_dir = "retrievals/test19"
+    output_dir = "retrievals/test19-1"
     ret_name=output_dir.split("/")[-1]
     k1_values = [0.5, 0.9, 1.2, 1.5, 2.0, 2.5]
     b_values = [0.3, 0.5, 0.75, 0.8, 1.0]
