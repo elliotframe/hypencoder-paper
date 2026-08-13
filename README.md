@@ -1,3 +1,5 @@
+# This is a fork of the Hypencoder repository, used for my level 4 project/dissertation
+
 # Hypencoder
 Official Repository for "Hypencoder: Hypernetworks for Information Retrieval".
 
