@@ -1,4 +1,4 @@
-from hypencoder_cb.inference.approx_retrieve import do_retrieval, HypecoderGraphRetriever, HypecoderGraphRetrieverBM25
+from hypencoder_cb.inference.approx_retrieve import do_retrieval, HypecoderGraphRetriever, HypecoderGraphRetrieverNew
 from typing import Dict, List, Optional, Union
 from itertools import product
 import json
@@ -19,13 +19,10 @@ def main(
     if not graph:
         graph=item_neighbors_path.split("/")[-1]
     cache_file=f"cache/{graph}"
-    ret_name=output_dir.split("/")[-1]
-    index_path = os.path.abspath(f"BM25index/trecdl2019judged")
+    index_path = os.path.abspath(f"BM25index/{graph}")
+    
 
-    nep = [5_000, 10_000, 50_000, 100_000, 500_000]
-    nc = [24, 64, 150, 328, 600]
-    mi = [6, 12, 16, 20, 24]
-
+    
     retriever_kwargs=dict(
             model_name_or_path=model_name_or_path,
             encoded_item_path=encoded_item_path,
@@ -44,61 +41,49 @@ def main(
         )
 
 
-    retriever = HypecoderGraphRetrieverBM25(
+    retriever = HypecoderGraphRetrieverNew(
             **retriever_kwargs
         )
     
+    ret_name=output_dir.split("/")[-1]
+    num_entry_points = 1024
+    ncandidates = 6
+    max_iter = 4
 
-    print(
-        "Enter parameters as: <num_entry_points> <ncandidates> <max_iter>\n"
-        "Type 'end' to stop."
-    )
+    metric_dir=f"metrics/September/{ret_name}/"
 
-    while True:
-        user_input = input(">>> ").strip()
-
-        if user_input.lower() == "end":
-            print("Ending retrieval loop.")
-            break
-
-        try:
-            x, y, z = map(int, user_input.split())
-        except ValueError:
-            print("Invalid input. Expected three integers or 'end'.")
-            continue
-
-        num_entry_points = x
-        ncandidates = y
-        max_iter = z
-
-        metric_dir = (
-            f"metrics/{ret_name}/entries/"
-            f"{num_entry_points}-{ncandidates}-{max_iter}"
-        )
-
-        retriever.set_parameters(num_entry_points, ncandidates, max_iter)
-
-        print(
-            f"Starting retrieval: "
-            f"num_entry_points={num_entry_points}, "
-            f"ncandidates={ncandidates}, "
-            f"max_iter={max_iter}"
-        )
-
-        do_retrieval(
-            retriever=retriever,
-            model_name_or_path=model_name_or_path,
-            encoded_item_path=encoded_item_path,
-            item_neighbors_path=item_neighbors_path,
-            output_dir=output_dir,
-            ir_dataset_name=ir_dataset_name,
-            dtype=dtype,
+    retriever.set_parameters(
             num_entry_points=num_entry_points,
             ncandidates=ncandidates,
             max_iter=max_iter,
-            cache_file=cache_file,
-            metric_dir=metric_dir,
+            seed_bm25=True,
+            seed_dph=False,
+            rrf_bm25=False,
+            rrf_dph=False,
         )
+
+    print(
+        f"Starting retrieval: "
+        f"{ret_name}"
+        f"num_entry_points={num_entry_points}, "
+        f"ncandidates={ncandidates}, "
+        f"max_iter={max_iter}"
+    )
+
+    do_retrieval(
+        retriever=retriever,
+        model_name_or_path=model_name_or_path,
+        encoded_item_path=encoded_item_path,
+        item_neighbors_path=item_neighbors_path,
+        output_dir=output_dir,
+        ir_dataset_name=ir_dataset_name,
+        dtype=dtype,
+        num_entry_points=num_entry_points,
+        ncandidates=ncandidates,
+        max_iter=max_iter,
+        cache_file=cache_file,
+        metric_dir=metric_dir,
+    )
 
 
     # print("Combining metrics.")
