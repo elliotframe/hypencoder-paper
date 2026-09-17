@@ -661,7 +661,7 @@ class HypecoderGraphRetrieverNew(BaseRetriever):
         self.b = b
         self.index_path = index_path
         self.ir_dataset = ir_dataset
-        self.index_ref = "irds:msmarco-passage"
+        self.index_ref = f"irds:{ir_dataset}"
         self.retriever = None
         self.seed_bm25 = seed_bm25
         self.seed_dph = seed_dph

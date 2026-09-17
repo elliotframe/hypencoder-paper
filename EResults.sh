@@ -57,61 +57,61 @@ python hypencoder_cb/work/single_retrieve.py \
 --ir_dataset_name=$IR_DATASET_NAME \
 --dtype=fp16 \
 
-# # treccovid
-# export ENCODING_PATH="~/nfs/hypencoder-paper/encodings/treccovid"
-# export RETRIEVAL_DIR="retrievals/September/treccovid"
-# export IR_DATASET_NAME="beir/trec-covid"
-# export ITEM_NEIGHBOR_GRAPH="graphs/treccovid"
+# treccovid
+export ENCODING_PATH="~/nfs/hypencoder-paper/encodings/treccovid"
+export RETRIEVAL_DIR="retrievals/September/treccovid"
+export IR_DATASET_NAME="beir/trec-covid"
+export ITEM_NEIGHBOR_GRAPH="graphs/treccovid"
 
-# python hypencoder_cb/work/single_retrieve.py \
-# --model_name_or_path=$MODEL_NAME_OR_PATH \
-# --encoded_item_path=$ENCODING_PATH \
-# --item_neighbors_path=$ITEM_NEIGHBOR_GRAPH \
-# --output_dir=$RETRIEVAL_DIR \
-# --ir_dataset_name=$IR_DATASET_NAME \
-# --dtype=fp16 \
+python hypencoder_cb/work/single_retrieve.py \
+--model_name_or_path=$MODEL_NAME_OR_PATH \
+--encoded_item_path=$ENCODING_PATH \
+--item_neighbors_path=$ITEM_NEIGHBOR_GRAPH \
+--output_dir=$RETRIEVAL_DIR \
+--ir_dataset_name=$IR_DATASET_NAME \
+--dtype=fp16 \
 
-# # nfcorpusTest
-# export ENCODING_PATH="~/nfs/hypencoder-paper/encodings/nfcorpusTest"
-# export RETRIEVAL_DIR="retrievals/September/nfcorpus"
-# export IR_DATASET_NAME="beir/nfcorpus/test"
-# export ITEM_NEIGHBOR_GRAPH="graphs/nfcorpusTest"
+# nfcorpusTest
+export ENCODING_PATH="~/nfs/hypencoder-paper/encodings/nfcorpusTest"
+export RETRIEVAL_DIR="retrievals/September/nfcorpus"
+export IR_DATASET_NAME="beir/nfcorpus/test"
+export ITEM_NEIGHBOR_GRAPH="graphs/nfcorpusTest"
 
-# python hypencoder_cb/work/single_retrieve.py \
-# --model_name_or_path=$MODEL_NAME_OR_PATH \
-# --encoded_item_path=$ENCODING_PATH \
-# --item_neighbors_path=$ITEM_NEIGHBOR_GRAPH \
-# --output_dir=$RETRIEVAL_DIR \
-# --ir_dataset_name=$IR_DATASET_NAME \
-# --dtype=fp16 \
+python hypencoder_cb/work/single_retrieve.py \
+--model_name_or_path=$MODEL_NAME_OR_PATH \
+--encoded_item_path=$ENCODING_PATH \
+--item_neighbors_path=$ITEM_NEIGHBOR_GRAPH \
+--output_dir=$RETRIEVAL_DIR \
+--ir_dataset_name=$IR_DATASET_NAME \
+--dtype=fp16 \
 
-# # dbpedia
-# export ENCODING_PATH="~/nfs/hypencoder-paper/encodings/dpedia-entityTest"
-# export RETRIEVAL_DIR="retrievals/September/dbpedia"
-# export IR_DATASET_NAME="beir/dbpedia-entity/test"
-# export ITEM_NEIGHBOR_GRAPH="graphs/dbpedia"
+# dbpedia
+export ENCODING_PATH="~/nfs/hypencoder-paper/encodings/dpedia-entityTest"
+export RETRIEVAL_DIR="retrievals/September/dbpedia"
+export IR_DATASET_NAME="beir/dbpedia-entity/test"
+export ITEM_NEIGHBOR_GRAPH="graphs/dbpedia"
 
-# python hypencoder_cb/work/single_retrieve.py \
-# --model_name_or_path=$MODEL_NAME_OR_PATH \
-# --encoded_item_path=$ENCODING_PATH \
-# --item_neighbors_path=$ITEM_NEIGHBOR_GRAPH \
-# --output_dir=$RETRIEVAL_DIR \
-# --ir_dataset_name=$IR_DATASET_NAME \
-# --dtype=fp16 \
+python hypencoder_cb/work/single_retrieve.py \
+--model_name_or_path=$MODEL_NAME_OR_PATH \
+--encoded_item_path=$ENCODING_PATH \
+--item_neighbors_path=$ITEM_NEIGHBOR_GRAPH \
+--output_dir=$RETRIEVAL_DIR \
+--ir_dataset_name=$IR_DATASET_NAME \
+--dtype=fp16 \
 
-# # touche
-# export ENCODING_PATH="~/nfs/hypencoder-paper/encodings/touche2020v2"
-# export RETRIEVAL_DIR="retrievals/September/touche"
-# export IR_DATASET_NAME="beir/webis-touche2020/v2"
-# export ITEM_NEIGHBOR_GRAPH="graphs/touche"
+# touche
+export ENCODING_PATH="~/nfs/hypencoder-paper/encodings/touche2020v2"
+export RETRIEVAL_DIR="retrievals/September/touche"
+export IR_DATASET_NAME="beir/webis-touche2020/v2"
+export ITEM_NEIGHBOR_GRAPH="graphs/touche"
 
-# python hypencoder_cb/work/single_retrieve.py \
-# --model_name_or_path=$MODEL_NAME_OR_PATH \
-# --encoded_item_path=$ENCODING_PATH \
-# --item_neighbors_path=$ITEM_NEIGHBOR_GRAPH \
-# --output_dir=$RETRIEVAL_DIR \
-# --ir_dataset_name=$IR_DATASET_NAME \
-# --dtype=fp16 \
+python hypencoder_cb/work/single_retrieve.py \
+--model_name_or_path=$MODEL_NAME_OR_PATH \
+--encoded_item_path=$ENCODING_PATH \
+--item_neighbors_path=$ITEM_NEIGHBOR_GRAPH \
+--output_dir=$RETRIEVAL_DIR \
+--ir_dataset_name=$IR_DATASET_NAME \
+--dtype=fp16 \
 
 
 
