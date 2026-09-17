@@ -89,7 +89,7 @@ python hypencoder_cb/work/single_retrieve.py \
 export ENCODING_PATH="~/nfs/hypencoder-paper/encodings/dpedia-entityTest"
 export RETRIEVAL_DIR="retrievals/September/dbpedia"
 export IR_DATASET_NAME="beir/dbpedia-entity/test"
-export ITEM_NEIGHBOR_GRAPH="graphs/dpedia"
+export ITEM_NEIGHBOR_GRAPH="graphs/dbpedia"
 
 python hypencoder_cb/work/single_retrieve.py \
 --model_name_or_path=$MODEL_NAME_OR_PATH \
