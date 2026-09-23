@@ -50,7 +50,7 @@ def main(
     ncandidates = 6
     max_iter = 4
 
-    metric_dir=f"metrics/September/{ret_name}/"
+    metric_dir=f"metrics/September/3090/{ret_name}/"
 
     retriever.set_parameters(
             num_entry_points=num_entry_points,
