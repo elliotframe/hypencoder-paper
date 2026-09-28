@@ -51,7 +51,8 @@ def main(
 
 
    
-    params = [[100_000, 328, 20], [10_000, 64, 16]]
+    # params = [[100_000, 328, 20], [10_000, 64, 16]]
+    params = [[10_000, 64, 16]]
     seeds = [x for x in range(30,60)]
     metric_dir=f"metrics/September/3090/{ret_name}/"
 
