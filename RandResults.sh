@@ -43,19 +43,19 @@ export MODEL_NAME_OR_PATH="jfkback/hypencoder.6_layer"
 # --dtype=fp16 \
 
 
-# fiqaTest
-export ENCODING_PATH="~/nfs/hypencoder-paper/encodings/fiqaTest"
-export RETRIEVAL_DIR="retrievals/September/3090/original/fiqaTest"
-export IR_DATASET_NAME="beir/fiqa/test"
-export ITEM_NEIGHBOR_GRAPH="graphs/fiqaTest"
+# # fiqaTest
+# export ENCODING_PATH="~/nfs/hypencoder-paper/encodings/fiqaTest"
+# export RETRIEVAL_DIR="retrievals/September/3090/original/fiqaTest"
+# export IR_DATASET_NAME="beir/fiqa/test"
+# export ITEM_NEIGHBOR_GRAPH="graphs/fiqaTest"
 
-python hypencoder_cb/work/random_seeds.py \
---model_name_or_path=$MODEL_NAME_OR_PATH \
---encoded_item_path=$ENCODING_PATH \
---item_neighbors_path=$ITEM_NEIGHBOR_GRAPH \
---output_dir=$RETRIEVAL_DIR \
---ir_dataset_name=$IR_DATASET_NAME \
---dtype=fp16 \
+# python hypencoder_cb/work/random_seeds.py \
+# --model_name_or_path=$MODEL_NAME_OR_PATH \
+# --encoded_item_path=$ENCODING_PATH \
+# --item_neighbors_path=$ITEM_NEIGHBOR_GRAPH \
+# --output_dir=$RETRIEVAL_DIR \
+# --ir_dataset_name=$IR_DATASET_NAME \
+# --dtype=fp16 \
 
 # # treccovid
 # export ENCODING_PATH="~/nfs/hypencoder-paper/encodings/treccovid"
