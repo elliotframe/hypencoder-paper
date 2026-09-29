@@ -50,7 +50,7 @@ def main(
     ncandidates = 6
     max_iter = 4
 
-    metric_dir=f"metrics/September/3090/{ret_name}/"
+    metric_dir=f"metrics/September/3090/{ret_name}-1/"
 
     retriever.set_parameters(
             num_entry_points=num_entry_points,
@@ -69,6 +69,22 @@ def main(
         f"ncandidates={ncandidates}, "
         f"max_iter={max_iter}"
     )
+
+    do_retrieval(
+        retriever=retriever,
+        model_name_or_path=model_name_or_path,
+        encoded_item_path=encoded_item_path,
+        item_neighbors_path=item_neighbors_path,
+        output_dir=output_dir,
+        ir_dataset_name=ir_dataset_name,
+        dtype=dtype,
+        num_entry_points=num_entry_points,
+        ncandidates=ncandidates,
+        max_iter=max_iter,
+        cache_file=cache_file,
+        metric_dir=metric_dir,
+    )
+    metric_dir=f"metrics/September/3090/{ret_name}-2/"
 
     do_retrieval(
         retriever=retriever,
