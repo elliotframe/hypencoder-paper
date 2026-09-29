@@ -90,25 +90,25 @@ def main(
     #         )
 
 
-    print("Combining metrics.")
-    fieldnames = ["Seed", "NumEntryPoints", "NCandidates", "MaxIter",
-              "P@10", "P@5", "R@10", "R@1000",
-              "RR", "RR@10", "nDCG@10", "nDCG@5"]
-    with open(f"metrics/September/3090/original/{ret_name}/results.csv", "w", newline="") as f:
-        writer = csv.DictWriter(f, fieldnames=fieldnames)
-        writer.writeheader()
-        for seed in seeds:
-            for num_entry_points, ncandidates, max_iter in params:
-                metric_dir=f"metrics/September/3090/original/{ret_name}/entries/{seed}-{num_entry_points}-{ncandidates}-{max_iter}/aggregated_metrics.json"
+    # print("Combining metrics.")
+    # fieldnames = ["Seed", "NumEntryPoints", "NCandidates", "MaxIter",
+    #           "P@10", "P@5", "R@10", "R@1000",
+    #           "RR", "RR@10", "nDCG@10", "nDCG@5"]
+    # with open(f"metrics/September/3090/original/{ret_name}/results.csv", "w", newline="") as f:
+    #     writer = csv.DictWriter(f, fieldnames=fieldnames)
+    #     writer.writeheader()
+    #     for seed in seeds:
+    #         for num_entry_points, ncandidates, max_iter in params:
+    #             metric_dir=f"metrics/September/3090/original/{ret_name}/entries/{seed}-{num_entry_points}-{ncandidates}-{max_iter}/aggregated_metrics.json"
 
-                with open(metric_dir, "r") as g:
-                    metrics = json.load(g)
+    #             with open(metric_dir, "r") as g:
+    #                 metrics = json.load(g)
 
-                row = {"Seed": seed, "NumEntryPoints": num_entry_points, "NCandidates": ncandidates, "MaxIter": max_iter}
-                row.update(metrics)
+    #             row = {"Seed": seed, "NumEntryPoints": num_entry_points, "NCandidates": ncandidates, "MaxIter": max_iter}
+    #             row.update(metrics)
 
-                writer.writerow(row)
-    print("Done :)")
+    #             writer.writerow(row)
+    # print("Done :)")
 
 
 
