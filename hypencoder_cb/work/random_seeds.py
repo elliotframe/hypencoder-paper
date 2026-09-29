@@ -5,6 +5,7 @@ import json
 import csv
 import fire
 import os
+from pathlib import Path
 
 def main(
     model_name_or_path: str,
@@ -27,73 +28,73 @@ def main(
     
 
     
-    retriever_kwargs=dict(
-            model_name_or_path=model_name_or_path,
-            encoded_item_path=encoded_item_path,
-            dtype=dtype,
-            batch_size=100_000,
-            query_max_length=64,
-            item_neighbors_path=item_neighbors_path,
-            num_entry_points=5_000,
-            ncandidates=24,
-            max_iter=6,
-            early_stop=True,
-            device="cuda",
-            cache_file=cache_file,
-            ir_dataset=ir_dataset_name,
-            index_path=index_path,
-        )
+    # retriever_kwargs=dict(
+    #         model_name_or_path=model_name_or_path,
+    #         encoded_item_path=encoded_item_path,
+    #         dtype=dtype,
+    #         batch_size=100_000,
+    #         query_max_length=64,
+    #         item_neighbors_path=item_neighbors_path,
+    #         num_entry_points=5_000,
+    #         ncandidates=24,
+    #         max_iter=6,
+    #         early_stop=True,
+    #         device="cuda",
+    #         cache_file=cache_file,
+    #         ir_dataset=ir_dataset_name,
+    #         index_path=index_path,
+    #     )
 
 
-    retriever = HypecoderGraphRetrieverNew(
-            **retriever_kwargs
-        )
+    # retriever = HypecoderGraphRetrieverNew(
+    #         **retriever_kwargs
+    #     )
 
 
    
-    # params = [[100_000, 328, 20], [10_000, 64, 16]]
-    params = [[10_000, 64, 16]]
+    params = [[100_000, 328, 20], [10_000, 64, 16]]
+    # params = [[10_000, 64, 16]]
     seeds = [x for x in range(30,60)]
     metric_dir=f"metrics/September/3090/{ret_name}/"
 
 
-    for seed in seeds:
-        for num_entry_points, ncandidates, max_iter in params:
-            metric_dir=f"metrics/September/3090/original/{ret_name}/entries/{seed}-{num_entry_points}-{ncandidates}-{max_iter}"
-            retriever.set_parameters(
-                num_entry_points=num_entry_points,
-                ncandidates=ncandidates,
-                max_iter=max_iter,
-                seed_bm25=False,
-                seed_dph=False,
-                rrf_bm25=False,
-                rrf_dph=False,
-                random_seed=seed
-            )
+    # for seed in seeds:
+    #     for num_entry_points, ncandidates, max_iter in params:
+    #         metric_dir=f"metrics/September/3090/original/{ret_name}/entries/{seed}-{num_entry_points}-{ncandidates}-{max_iter}"
+    #         retriever.set_parameters(
+    #             num_entry_points=num_entry_points,
+    #             ncandidates=ncandidates,
+    #             max_iter=max_iter,
+    #             seed_bm25=False,
+    #             seed_dph=False,
+    #             rrf_bm25=False,
+    #             rrf_dph=False,
+    #             random_seed=seed
+    #         )
 
-            print(f"Starting retrieval: seed={seed}, num_entry_points={num_entry_points}, ncandidates={ncandidates}, max_iter={max_iter}")
+    #         print(f"Starting retrieval: seed={seed}, num_entry_points={num_entry_points}, ncandidates={ncandidates}, max_iter={max_iter}")
             
-            do_retrieval(
-                retriever=retriever,
-                model_name_or_path=model_name_or_path,
-                encoded_item_path=encoded_item_path,
-                item_neighbors_path=item_neighbors_path,
-                output_dir=output_dir,
-                ir_dataset_name=ir_dataset_name,
-                dtype=dtype,
-                num_entry_points=num_entry_points,
-                ncandidates=ncandidates,
-                max_iter=max_iter,
-                cache_file=cache_file,
-                metric_dir=metric_dir
-            )
+    #         do_retrieval(
+    #             retriever=retriever,
+    #             model_name_or_path=model_name_or_path,
+    #             encoded_item_path=encoded_item_path,
+    #             item_neighbors_path=item_neighbors_path,
+    #             output_dir=output_dir,
+    #             ir_dataset_name=ir_dataset_name,
+    #             dtype=dtype,
+    #             num_entry_points=num_entry_points,
+    #             ncandidates=ncandidates,
+    #             max_iter=max_iter,
+    #             cache_file=cache_file,
+    #             metric_dir=metric_dir
+    #         )
 
 
     print("Combining metrics.")
     fieldnames = ["Seed", "NumEntryPoints", "NCandidates", "MaxIter",
               "P@10", "P@5", "R@10", "R@1000",
               "RR", "RR@10", "nDCG@10", "nDCG@5"]
-    with open(f"metrics/{ret_name}/results.csv", "w", newline="") as f:
+    with open(f"metrics/September/3090/original/{ret_name}/results.csv", "w", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=fieldnames)
         writer.writeheader()
         for seed in seeds:
@@ -109,6 +110,36 @@ def main(
                 writer.writerow(row)
     print("Done :)")
 
+
+
+    results_path = Path(f"metrics/September/3090/original/{ret_name}/results.csv")
+
+    rows = []
+    with results_path.open("r", newline="") as f:
+        reader = csv.DictReader(f)
+        fieldnames = reader.fieldnames + ["num_queries", "time"]
+
+        for line in reader:
+            w = line["Seed"]
+            x = line["NumEntryPoints"]
+            y = line["NCandidates"]
+            z = line["MaxIter"]
+
+            timing_path = Path(f"metrics/September/3090/original/{ret_name}/entries/{w}-{x}-{y}-{z}/timing.json")
+            with timing_path.open("r") as g:
+                timing = json.load(g)
+
+            line["num_queries"] = timing["num_queries"]
+            line["time"] = timing["time"]
+            rows.append(line)
+
+    with results_path.open("w", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=fieldnames)
+        writer.writeheader()
+        writer.writerows(rows)
+
+
+    print("Done :)")
 
    
     
