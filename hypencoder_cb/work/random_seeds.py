@@ -52,8 +52,8 @@ def main(
 
 
    
-    params = [[100_000, 328, 20], [10_000, 64, 16]]
-    # params = [[10_000, 64, 16]]
+    # params = [[100_000, 328, 20], [10_000, 64, 16]]
+    params = [[10_000, 64, 16]]
     seeds = [x for x in range(30,60)]
     metric_dir=f"metrics/September/3090/{ret_name}/"
 
@@ -91,12 +91,12 @@ def main(
 
 
     print("Combining metrics.")
-    # fieldnames = ["Seed", "NumEntryPoints", "NCandidates", "MaxIter",
-    #           "P@10", "P@5", "R@10", "R@1000",
-    #           "RR", "RR@10", "nDCG@10", "nDCG@5"]
     fieldnames = ["Seed", "NumEntryPoints", "NCandidates", "MaxIter",
-              "P(rel=2)@10", "P(rel=2)@5", "R(rel=2)@10", "R(rel=2)@1000",
-              "RR(rel=2)", "RR(rel=2)@10", "nDCG@10", "nDCG@5"]
+              "P@10", "P@5", "R@10", "R@1000",
+              "RR", "RR@10", "nDCG@10", "nDCG@5"]
+    # fieldnames = ["Seed", "NumEntryPoints", "NCandidates", "MaxIter",
+    #           "P(rel=2)@10", "P(rel=2)@5", "R(rel=2)@10", "R(rel=2)@1000",
+    #           "RR(rel=2)", "RR(rel=2)@10", "nDCG@10", "nDCG@5"]
     with open(f"metrics/September/3090/original/{ret_name}/results.csv", "w", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=fieldnames)
         writer.writeheader()
