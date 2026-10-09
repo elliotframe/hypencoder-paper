@@ -1,4 +1,8 @@
-from hypencoder_cb.inference.retrieve import do_retrieval_shared
+from hypencoder_cb.utils.data_utils import load_qrels_from_ir_datasets
+from hypencoder_cb.utils.eval_utils import (
+    calculate_metrics_to_file,
+    metric_names_for_dataset,
+)
 from hypencoder_cb.inference.shared import (
     BaseRetriever,
     Item,
@@ -10,8 +14,11 @@ from hypencoder_cb.utils.torch_utils import dtype_lookup
 from transformers import AutoTokenizer
 from typing import List, Optional, Union
 from pyterrier_pisa import PisaIndex
+from pathlib import Path
 from tqdm import tqdm
+import ir_datasets
 import pyterrier as pt
+import time
 import pickle
 import torch
 import json
@@ -98,8 +105,6 @@ class HypencoderBM25Reranker(BaseRetriever):
             }
             del encoded_items
 
-        if not pt.started():
-            pt.init()
         self.index = PisaIndex(index_path)
         if not os.path.exists(os.path.join(index_path, "fwd.documents")):
             dataset = pt.get_dataset(f"irds:{ir_dataset}")
@@ -150,6 +155,30 @@ class HypencoderBM25Reranker(BaseRetriever):
         ]
 
 
+def combine_metrics(ret_name: str, names: List[str], num_bm25: int = 1000) -> None:
+    print("Combining metrics.")
+    rows = []
+    for name in names:
+        with open(f"metrics/{ret_name}/{name}/aggregated_metrics.json", "r") as g:
+            metrics = json.load(g)
+        with open(f"metrics/{ret_name}/{name}/timing.json", "r") as g:
+            timing = json.load(g)
+
+        row = {"Dataset": name, "NumBM25": num_bm25}
+        # Drop "(rel=2)" so TREC DL and other datasets share columns
+        row.update({k.replace("(rel=2)", ""): v for k, v in metrics.items()})
+        row["num_queries"] = timing["num_queries"]
+        row["time"] = timing["time"]
+        rows.append(row)
+
+    fieldnames = list(dict.fromkeys(k for row in rows for k in row))
+    with open(f"metrics/{ret_name}/results.csv", "w", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=fieldnames)
+        writer.writeheader()
+        writer.writerows(rows)
+    print("Done :)")
+
+
 def main(
     model_name_or_path: str = "jfkback/hypencoder.6_layer",
     encoding_root: str = "~/nfs/hypencoder-paper/encodings",
@@ -197,36 +226,41 @@ def main(
 
         print(f"Starting retrieval: dataset={name}, num_bm25={num_bm25}")
 
-        do_retrieval_shared(
-            retriever=retriever,
-            retriever_cls=HypencoderBM25Reranker,
-            retriever_kwargs={},
-            output_dir=f"retrievals/{ret_name}/{name}",
-            ir_dataset_name=ir_dataset_name,
-            top_k=num_bm25,
-            metric_dir=f"metrics/{ret_name}/{name}",
+        output_dir = Path(f"retrievals/{ret_name}/{name}")
+        metric_dir = Path(f"metrics/{ret_name}/{name}")
+        output_dir.mkdir(parents=True, exist_ok=True)
+        metric_dir.mkdir(parents=True, exist_ok=True)
+
+        queries = [
+            TextQuery(id=q.query_id, text=q.text)
+            for q in ir_datasets.load(ir_dataset_name).queries_iter()
+        ]
+
+        run = {}
+        start_time = time.time()
+        for query in tqdm(queries, desc=name):
+            items = retriever.retrieve(query, top_k=num_bm25)
+            run[query.id] = {item.id: item.score for item in items}
+        elapsed = time.time() - start_time
+        print(f"Retrieved {len(queries)} queries in {elapsed:.2f}s ({elapsed / len(queries):.4f}s/query)")
+
+        with open(metric_dir / "timing.json", "w") as f:
+            json.dump({"num_queries": len(queries), "time": elapsed}, f)
+
+        with open(output_dir / "run.trec", "w") as f:
+            for qid, docs in run.items():
+                ranked = sorted(docs.items(), key=lambda x: x[1], reverse=True)
+                for rank, (doc_id, score) in enumerate(ranked, start=1):
+                    f.write(f"{qid} Q0 {doc_id} {rank} {score} {ret_name}\n")
+
+        calculate_metrics_to_file(
+            run,
+            load_qrels_from_ir_datasets(ir_dataset_name),
+            metric_dir,
+            metric_names=metric_names_for_dataset(ir_dataset_name),
         )
 
-    print("Combining metrics.")
-    rows = []
-    for name, _, _, _ in selected:
-        with open(f"metrics/{ret_name}/{name}/aggregated_metrics.json", "r") as g:
-            metrics = json.load(g)
-        with open(f"metrics/{ret_name}/{name}/timing.json", "r") as g:
-            timing = json.load(g)
-
-        row = {"Dataset": name, "NumBM25": num_bm25}
-        row.update(metrics)
-        row["num_queries"] = timing["num_queries"]
-        row["time"] = timing["time"]
-        rows.append(row)
-
-    fieldnames = list(dict.fromkeys(k for row in rows for k in row))
-    with open(f"metrics/{ret_name}/results.csv", "w", newline="") as f:
-        writer = csv.DictWriter(f, fieldnames=fieldnames)
-        writer.writeheader()
-        writer.writerows(rows)
-    print("Done :)")
+    combine_metrics(ret_name, [d[0] for d in selected], num_bm25)
 
 
 if __name__ == "__main__":

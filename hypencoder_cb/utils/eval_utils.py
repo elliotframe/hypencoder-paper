@@ -20,16 +20,23 @@ DEFAULT_METRICS = [
     "MRR(rel=2)@10",
 ]
 
-# DEFAULT_METRICS = [
-#     "nDCG@10",
-#     "nDCG@5",
-#     "P@10",
-#     "P@5",
-#     "R@10",
-#     "MRR",
-#     "R@1000",
-#     "MRR@10",
-# ]
+BINARY_METRICS = [
+    "nDCG@10",
+    "nDCG@5",
+    "P@10",
+    "P@5",
+    "R@10",
+    "MRR",
+    "R@1000",
+    "MRR@10",
+]
+
+
+def metric_names_for_dataset(ir_dataset_name: str) -> List[str]:
+    # TREC DL uses graded relevance, so binary metrics count only rel >= 2
+    if "trec-dl" in ir_dataset_name:
+        return DEFAULT_METRICS
+    return BINARY_METRICS
 
 
 def pretty_print_aggregated_metrics(
