@@ -66,9 +66,7 @@ def main(
     #             ncandidates=ncandidates,
     #             max_iter=max_iter,
     #             seed_bm25=False,
-    #             seed_dph=False,
     #             rrf_bm25=False,
-    #             rrf_dph=False,
     #             random_seed=seed
     #         )
 

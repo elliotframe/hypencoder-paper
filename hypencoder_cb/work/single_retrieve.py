@@ -57,9 +57,7 @@ def main(
             ncandidates=ncandidates,
             max_iter=max_iter,
             seed_bm25=True,
-            seed_dph=False,
             rrf_bm25=False,
-            rrf_dph=False,
         )
 
     print(
