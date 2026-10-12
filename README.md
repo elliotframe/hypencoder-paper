@@ -1,4 +1,4 @@
-# This is a fork of the Hypencoder repository, used for my level 4 project/dissertation
+# This is a fork of the Hypencoder repository, used to test seed selection for approximate retrieval with BM25
 
 # Hypencoder
 Official Repository for "Hypencoder: Hypernetworks for Information Retrieval".
